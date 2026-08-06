@@ -6,7 +6,7 @@ report_product = defaultdict(int)
 report_category = defaultdict(int)
 all_transactions = []  
 
-with open("sales.csv", "r") as file:
+with open("sales1.csv", "r") as file:
     reader = csv.DictReader(file)
     for row in reader:
         revenue = int(row["quantity"]) * int(row["unit_price"])
