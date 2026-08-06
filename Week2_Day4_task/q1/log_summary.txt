@@ -1,0 +1,9 @@
+=== Log Summary ===
+INFO : 2
+WARNING : 1
+ERROR : 2
+DEBUG : 0
+Errors found:
+- Database connection timeout
+
+- Null pointer in payment module
