@@ -1,4 +1,3 @@
-from collections import defaultdict
 import csv
 from grading import get_grade
 
