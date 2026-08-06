@@ -2,7 +2,7 @@ from collections import defaultdict
 import csv
 from grading import get_grade
 
-report = defaultdict(float)
+report = {}
 
 passed = 0
 failed = 0
