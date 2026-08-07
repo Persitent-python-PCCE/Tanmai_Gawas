@@ -5,6 +5,8 @@ example.py
 filehandling.py
 info.csv
 my_package/
-myvenv/
 output.csv
 sales.csv
+classes.py
+demo.py  
+myvenv/
