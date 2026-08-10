@@ -8,5 +8,12 @@ my_package/
 output.csv
 sales.csv
 classes.py
-demo.py  
+demo.py
 myvenv/
+abs.py
+inheritance.py
+polymorphism.py
+Week2_Day5_exception_handling_task/
+dunder.py
+text.txt
+initial2.py
