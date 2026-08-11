@@ -121,24 +121,31 @@ def choose_op(attacker, fighters):
     return random.choice(living_enemies) if living_enemies else None
 
 
-while sum(f.is_alive() for f in fighters) > 1:
-        turn_order = sorted(fighters, key=lambda f: f.speed, reverse=True)
+while True:
+        count = 0
+        for f in turn_order:
+            if f.is_alive():
+                count+=1
+        if count > 1:
+            turn_order = sorted(fighters, key=lambda f: f.speed, reverse=True)
 
-        for fighter in turn_order:
-            if not fighter.is_alive():
-                continue
+            for fighter in turn_order:
+                if not fighter.is_alive():
+                    continue
 
-            if sum(f.is_alive() for f in fighters) <= 1:
-                break
+                if sum(f.is_alive() for f in fighters) <= 1:
+                    break
 
-            target = choose_op(fighter, fighters)
-            if target is None:
-                break
+                target = choose_op(fighter, fighters)
+                if target is None:
+                    break
 
-            fighter.attack(target)
+                fighter.attack(target)
 
-            if not target.is_alive():
-                print(f"{target.name} is defeated!")
+                if not target.is_alive():
+                    print(f"{target.name} is defeated!")
+        else:
+            break
 
 champion = [f for f in fighters if f.is_alive()]
 print(f"{champion[0].name} ({champion[0]}) wins the battle!")
