@@ -1,0 +1,107 @@
+[
+    {
+        "student_id": 33,
+        "name": "Daniel",
+        "age": 24,
+        "department": "Mechanical",
+        "marks": {
+            "Python": 21,
+            "Database": 8,
+            "Computer Networks": 51
+        },
+        "total": 80,
+        "average": 26.67,
+        "result": "Fail",
+        "exam_date": "2026-10-23"
+    },
+    {
+        "student_id": 36,
+        "name": "Sofia",
+        "age": 24,
+        "department": "Information Technology",
+        "marks": {
+            "Python": 43,
+            "Database": 15,
+            "Computer Networks": 75
+        },
+        "total": 133,
+        "average": 44.33,
+        "result": "Fail",
+        "exam_date": "2026-07-19"
+    },
+    {
+        "student_id": 64,
+        "name": "Lucas",
+        "age": 19,
+        "department": "Computer Science",
+        "marks": {
+            "Python": 89,
+            "Database": 91,
+            "Computer Networks": 52
+        },
+        "total": 232,
+        "average": 77.33,
+        "result": "Pass",
+        "exam_date": "2026-06-05"
+    },
+    {
+        "student_id": 92,
+        "name": "Kiara",
+        "age": 25,
+        "department": "Information Technology",
+        "marks": {
+            "Python": 77,
+            "Database": 81,
+            "Computer Networks": 100
+        },
+        "total": 258,
+        "average": 86.0,
+        "result": "Pass",
+        "exam_date": "2026-04-09"
+    },
+    {
+        "student_id": 7,
+        "name": "Maya",
+        "age": 19,
+        "department": "Mechanical",
+        "marks": {
+            "Python": 11,
+            "Database": 31,
+            "Computer Networks": 11
+        },
+        "total": 53,
+        "average": 17.67,
+        "result": "Fail",
+        "exam_date": "2026-08-06"
+    },
+    {
+        "student_id": 1,
+        "name": "Ananya",
+        "age": 18,
+        "department": "Computer Science",
+        "marks": {
+            "Python": 1,
+            "Database": 23,
+            "Computer Networks": 99
+        },
+        "total": 123,
+        "average": 41.0,
+        "result": "Fail",
+        "exam_date": "2026-10-23"
+    },
+    {
+        "student_id": 79,
+        "name": "Ethan",
+        "age": 25,
+        "department": "Information Technology",
+        "marks": {
+            "Python": 72,
+            "Database": 29,
+            "Computer Networks": 91
+        },
+        "total": 192,
+        "average": 64.0,
+        "result": "Fail",
+        "exam_date": "2026-03-03"
+    }
+]

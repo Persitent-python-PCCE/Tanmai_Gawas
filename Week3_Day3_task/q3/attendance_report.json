@@ -1,0 +1,52 @@
+[
+    {
+        "employee_id": 7131,
+        "name": "Priya Sharma",
+        "department": "Sales",
+        "total_working_days": 28,
+        "present_days": 22,
+        "absent_days": 5,
+        "leave_days": 1,
+        "attendance_percentage": 78.57
+    },
+    {
+        "employee_id": 4730,
+        "name": "Sneha Patil",
+        "department": "IT",
+        "total_working_days": 28,
+        "present_days": 23,
+        "absent_days": 2,
+        "leave_days": 3,
+        "attendance_percentage": 82.14
+    },
+    {
+        "employee_id": 6228,
+        "name": "Amit Singh",
+        "department": "IT",
+        "total_working_days": 28,
+        "present_days": 23,
+        "absent_days": 3,
+        "leave_days": 2,
+        "attendance_percentage": 82.14
+    },
+    {
+        "employee_id": 8553,
+        "name": "Rohan Nair",
+        "department": "Finance",
+        "total_working_days": 28,
+        "present_days": 24,
+        "absent_days": 2,
+        "leave_days": 2,
+        "attendance_percentage": 85.71
+    },
+    {
+        "employee_id": 8645,
+        "name": "Neha Desai",
+        "department": "IT",
+        "total_working_days": 28,
+        "present_days": 19,
+        "absent_days": 4,
+        "leave_days": 5,
+        "attendance_percentage": 67.86
+    }
+]

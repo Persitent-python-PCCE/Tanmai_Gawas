@@ -1,0 +1,9 @@
+store_name: TechStore
+minimum_order_amount: 500
+maximum_order_amount: 100000
+default_currency: INR
+allowed_statuses:
+  - Pending
+  - Shipped
+  - Delivered
+  - Cancelled

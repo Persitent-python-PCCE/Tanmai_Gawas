@@ -1,0 +1,182 @@
+<employees>
+    <employee>
+        <id>7131</id>
+        <name>Priya Sharma</name>
+        <department>Sales</department>
+        <joining_date>2025-03-11</joining_date>
+        <attendance>
+            <day date="2027-02-01">Present</day>
+            <day date="2027-02-02">Present</day>
+            <day date="2027-02-03">Absent</day>
+            <day date="2027-02-04">Present</day>
+            <day date="2027-02-05">Present</day>
+            <day date="2027-02-06">Present</day>
+            <day date="2027-02-07">Leave</day>
+            <day date="2027-02-08">Absent</day>
+            <day date="2027-02-09">Absent</day>
+            <day date="2027-02-10">Present</day>
+            <day date="2027-02-11">Present</day>
+            <day date="2027-02-12">Present</day>
+            <day date="2027-02-13">Present</day>
+            <day date="2027-02-14">Present</day>
+            <day date="2027-02-15">Present</day>
+            <day date="2027-02-16">Present</day>
+            <day date="2027-02-17">Present</day>
+            <day date="2027-02-18">Present</day>
+            <day date="2027-02-19">Present</day>
+            <day date="2027-02-20">Absent</day>
+            <day date="2027-02-21">Present</day>
+            <day date="2027-02-22">Present</day>
+            <day date="2027-02-23">Present</day>
+            <day date="2027-02-24">Present</day>
+            <day date="2027-02-25">Present</day>
+            <day date="2027-02-26">Present</day>
+            <day date="2027-02-27">Absent</day>
+            <day date="2027-02-28">Present</day>
+        </attendance>
+    </employee>
+    <employee>
+        <id>4730</id>
+        <name>Sneha Patil</name>
+        <department>IT</department>
+        <joining_date>2023-07-08</joining_date>
+        <attendance>
+            <day date="2027-02-01">Present</day>
+            <day date="2027-02-02">Present</day>
+            <day date="2027-02-03">Present</day>
+            <day date="2027-02-04">Present</day>
+            <day date="2027-02-05">Present</day>
+            <day date="2027-02-06">Present</day>
+            <day date="2027-02-07">Present</day>
+            <day date="2027-02-08">Present</day>
+            <day date="2027-02-09">Present</day>
+            <day date="2027-02-10">Present</day>
+            <day date="2027-02-11">Leave</day>
+            <day date="2027-02-12">Present</day>
+            <day date="2027-02-13">Present</day>
+            <day date="2027-02-14">Present</day>
+            <day date="2027-02-15">Present</day>
+            <day date="2027-02-16">Present</day>
+            <day date="2027-02-17">Leave</day>
+            <day date="2027-02-18">Present</day>
+            <day date="2027-02-19">Present</day>
+            <day date="2027-02-20">Present</day>
+            <day date="2027-02-21">Present</day>
+            <day date="2027-02-22">Present</day>
+            <day date="2027-02-23">Present</day>
+            <day date="2027-02-24">Present</day>
+            <day date="2027-02-25">Absent</day>
+            <day date="2027-02-26">Present</day>
+            <day date="2027-02-27">Absent</day>
+            <day date="2027-02-28">Leave</day>
+        </attendance>
+    </employee>
+    <employee>
+        <id>6228</id>
+        <name>Amit Singh</name>
+        <department>IT</department>
+        <joining_date>2023-05-12</joining_date>
+        <attendance>
+            <day date="2027-02-01">Present</day>
+            <day date="2027-02-02">Present</day>
+            <day date="2027-02-03">Present</day>
+            <day date="2027-02-04">Present</day>
+            <day date="2027-02-05">Present</day>
+            <day date="2027-02-06">Present</day>
+            <day date="2027-02-07">Absent</day>
+            <day date="2027-02-08">Present</day>
+            <day date="2027-02-09">Present</day>
+            <day date="2027-02-10">Present</day>
+            <day date="2027-02-11">Absent</day>
+            <day date="2027-02-12">Present</day>
+            <day date="2027-02-13">Present</day>
+            <day date="2027-02-14">Leave</day>
+            <day date="2027-02-15">Present</day>
+            <day date="2027-02-16">Present</day>
+            <day date="2027-02-17">Present</day>
+            <day date="2027-02-18">Absent</day>
+            <day date="2027-02-19">Present</day>
+            <day date="2027-02-20">Present</day>
+            <day date="2027-02-21">Leave</day>
+            <day date="2027-02-22">Present</day>
+            <day date="2027-02-23">Present</day>
+            <day date="2027-02-24">Present</day>
+            <day date="2027-02-25">Present</day>
+            <day date="2027-02-26">Present</day>
+            <day date="2027-02-27">Present</day>
+            <day date="2027-02-28">Present</day>
+        </attendance>
+    </employee>
+    <employee>
+        <id>8553</id>
+        <name>Rohan Nair</name>
+        <department>Finance</department>
+        <joining_date>2023-07-01</joining_date>
+        <attendance>
+            <day date="2027-02-01">Present</day>
+            <day date="2027-02-02">Present</day>
+            <day date="2027-02-03">Present</day>
+            <day date="2027-02-04">Present</day>
+            <day date="2027-02-05">Present</day>
+            <day date="2027-02-06">Present</day>
+            <day date="2027-02-07">Present</day>
+            <day date="2027-02-08">Present</day>
+            <day date="2027-02-09">Present</day>
+            <day date="2027-02-10">Absent</day>
+            <day date="2027-02-11">Present</day>
+            <day date="2027-02-12">Present</day>
+            <day date="2027-02-13">Present</day>
+            <day date="2027-02-14">Present</day>
+            <day date="2027-02-15">Leave</day>
+            <day date="2027-02-16">Present</day>
+            <day date="2027-02-17">Present</day>
+            <day date="2027-02-18">Present</day>
+            <day date="2027-02-19">Present</day>
+            <day date="2027-02-20">Present</day>
+            <day date="2027-02-21">Present</day>
+            <day date="2027-02-22">Present</day>
+            <day date="2027-02-23">Present</day>
+            <day date="2027-02-24">Present</day>
+            <day date="2027-02-25">Present</day>
+            <day date="2027-02-26">Leave</day>
+            <day date="2027-02-27">Present</day>
+            <day date="2027-02-28">Absent</day>
+        </attendance>
+    </employee>
+    <employee>
+        <id>8645</id>
+        <name>Neha Desai</name>
+        <department>IT</department>
+        <joining_date>2023-05-11</joining_date>
+        <attendance>
+            <day date="2027-02-01">Present</day>
+            <day date="2027-02-02">Present</day>
+            <day date="2027-02-03">Present</day>
+            <day date="2027-02-04">Present</day>
+            <day date="2027-02-05">Present</day>
+            <day date="2027-02-06">Present</day>
+            <day date="2027-02-07">Absent</day>
+            <day date="2027-02-08">Present</day>
+            <day date="2027-02-09">Present</day>
+            <day date="2027-02-10">Leave</day>
+            <day date="2027-02-11">Present</day>
+            <day date="2027-02-12">Present</day>
+            <day date="2027-02-13">Present</day>
+            <day date="2027-02-14">Present</day>
+            <day date="2027-02-15">Leave</day>
+            <day date="2027-02-16">Present</day>
+            <day date="2027-02-17">Leave</day>
+            <day date="2027-02-18">Present</day>
+            <day date="2027-02-19">Present</day>
+            <day date="2027-02-20">Leave</day>
+            <day date="2027-02-21">Absent</day>
+            <day date="2027-02-22">Present</day>
+            <day date="2027-02-23">Absent</day>
+            <day date="2027-02-24">Absent</day>
+            <day date="2027-02-25">Leave</day>
+            <day date="2027-02-26">Present</day>
+            <day date="2027-02-27">Present</day>
+            <day date="2027-02-28">Present</day>
+        </attendance>
+    </employee>
+</employees>
