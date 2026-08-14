@@ -1,0 +1,45 @@
+# Virtual environment
+myvenv/
+venv/
+env/
+.venv/
+
+# Environment variables (DB credentials etc.)
+.env
+.env.*
+!.env.example
+
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# App-specific generated content
+logs/
+backups/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Misc local overrides
+*.log
+*.sqlite3
