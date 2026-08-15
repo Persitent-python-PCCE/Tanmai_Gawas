@@ -10,12 +10,19 @@ class OrderService:
         self.product_dao = product_dao
         self.cart_service = cart_service
 
-    def place_order(self, user_id, email, full_name):
+    def place_order(self, user_id, email, full_name, product_ids=None):
         summary = self.cart_service.get_cart_summary(user_id)
         if not summary:
             raise ValueError("Cart is empty. Add products before placing an order.")
 
+        if product_ids is not None:
+            target_ids = set(int(pid) for pid in product_ids)
+            summary = [item for item in summary if item["product"].product_id in target_ids]
+            if not summary:
+                raise ValueError("None of the selected items are in the cart.")
+
         items_to_checkout = []
+        total_price = 0.0
         for item in summary:
             p = item["product"]
             qty = item["quantity"]
@@ -32,12 +39,17 @@ class OrderService:
                 "quantity": qty,
                 "price": float(p.price)
             })
+            total_price += float(p.price) * qty
 
-        total_price = self.cart_service.get_cart_total(user_id)
         try:
             order_id = self.order_dao.place_order_transaction(user_id, total_price, items_to_checkout)
             log_action(f"Order #{order_id} placed successfully by '{full_name}'. Total: ${total_price:.2f}")
-            self.cart_service.clear_cart(user_id)
+            
+            if product_ids is not None:
+                self.cart_service.remove_items_from_cart(user_id, [item["product_id"] for item in items_to_checkout])
+            else:
+                self.cart_service.clear_cart(user_id)
+                
             send_order_placed_email(email, full_name, order_id, total_price, items_to_checkout)
             return order_id
         except Exception as e:
@@ -53,6 +65,7 @@ class OrderService:
                 "order_id": o["id"],
                 "order_date": o["order_date"],
                 "total_price": float(o["total_price"]),
+                "status": o.get("status", "Pending"),
                 "items": items
             })
         return history
@@ -67,6 +80,7 @@ class OrderService:
                 "full_name": o["full_name"],
                 "order_date": o["order_date"],
                 "total_price": float(o["total_price"]),
+                "status": o.get("status", "Pending"),
                 "items": items
             })
         return all_orders
@@ -86,6 +100,22 @@ class OrderService:
                 "full_name": o["full_name"],
                 "order_date": o["order_date"],
                 "total_price": float(o["total_price"]),
+                "status": o.get("status", "Pending"),
                 "items": items
             })
         return PageResult(orders, total, spec.page, spec.page_size)
+
+    def approve_order(self, order_id):
+        order = self.order_dao.get_order_by_id(order_id)
+        if not order:
+            raise ValueError(f"Order #{order_id} does not exist.")
+        
+        current_status = order.get("status", "Pending")
+        if current_status == "Approved":
+            raise ValueError(f"Order #{order_id} is already approved.")
+            
+        success = self.order_dao.update_order_status(order_id, "Approved")
+        if not success:
+            raise ValueError(f"Failed to update status for Order #{order_id}.")
+        log_action(f"Order #{order_id} approved by admin.")
+        return True

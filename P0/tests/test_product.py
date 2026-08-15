@@ -49,7 +49,6 @@ class TestProduct(unittest.TestCase):
 
         self.assertEqual(result["inserted"], 0)
         self.assertEqual(len(result["failed"]), 3)
-        # Ensure errors are correctly captured with line numbers (header is row 1, first data is row 2)
-        self.assertEqual(result["failed"][0][0], 2)  # Row 2: name is empty
-        self.assertEqual(result["failed"][1][0], 3)  # Row 3: price must be > 0 (it's -5)
-        self.assertEqual(result["failed"][2][0], 4)  # Row 4: stock cannot be negative (it's -2)
+        self.assertEqual(result["failed"][0][0], 2)
+        self.assertEqual(result["failed"][1][0], 3)
+        self.assertEqual(result["failed"][2][0], 4)

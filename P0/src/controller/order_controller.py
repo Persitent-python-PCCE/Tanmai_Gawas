@@ -5,43 +5,86 @@ class OrderController:
         self.order_service = order_service
 
     def place_order_menu(self, customer):
+        summary = self.order_service.cart_service.get_cart_summary(customer.user_id)
+        if not summary:
+            print("  [!] Cart is empty. Add products before placing an order.")
+            return
+
+        print("\n--- CHECKOUT ---")
+        print("  1. Checkout all items")
+        print("  2. Select specific items to checkout")
+        print("  3. Cancel")
+        
+        choice = get_int_input("Select checkout option: ", min_val=1, max_val=3)
+        if choice == 3:
+            return
+
+        product_ids = None
+        if choice == 2:
+            print("\nItems in your cart:")
+            for idx, item in enumerate(summary, 1):
+                p = item["product"]
+                qty = item["quantity"]
+                print(f"  {idx}. {p.name} x{qty} @ ${float(p.price):.2f} (Subtotal: ${item['subtotal']:.2f})")
+            
+            indices_input = input("\nEnter the numbers of the items to checkout (comma-separated, e.g. 1,3): ").strip()
+            if not indices_input:
+                print("  [!] No items selected. Checkout cancelled.")
+                return
+            
+            try:
+                indices = [int(x.strip()) - 1 for x in indices_input.split(",") if x.strip()]
+                selected_items = [summary[idx] for idx in indices if 0 <= idx < len(summary)]
+                if not selected_items:
+                    print("  [!] No valid items selected. Checkout cancelled.")
+                    return
+                product_ids = [item["product"].product_id for item in selected_items]
+            except Exception:
+                print("  [!] Invalid input format. Checkout cancelled.")
+                return
+
         try:
-            order_id = self.order_service.place_order(customer.user_id,customer.email, customer.full_name)
+            order_id = self.order_service.place_order(
+                customer.user_id,
+                customer.email,
+                customer.full_name,
+                product_ids=product_ids
+            )
             print(f"\n  [OK] Order #{order_id} placed successfully! Thank you for shopping with us.")
         except ValueError as e:
             print(f"  [!] Order failed: {e}")
 
     def view_order_history_menu(self, customer):
         history = self.order_service.get_order_history(customer.user_id)
-        print("\n" + "=" * 70)
-        print(f"{'YOUR ORDER HISTORY':^70}")
-        print("=" * 70)
+        print("\n" + "=" * 75)
+        print(f"{'YOUR ORDER HISTORY':^75}")
+        print("=" * 75)
         if not history:
-            print(f"{'You have not placed any orders yet.':^70}")
+            print(f"{'You have not placed any orders yet.':^75}")
         else:
             for o in history:
-                print(f"Order #{o['order_id']} | Date: {o['order_date']} | Total: ${o['total_price']:.2f}")
+                print(f"Order #{o['order_id']} | Date: {o['order_date']} | Status: {o['status']} | Total: ${o['total_price']:.2f}")
                 print("  Items:")
                 for item in o["items"]:
                     print(f"    - {item['product_name']} x{item['quantity']} @ ${float(item['price']):.2f}")
-                print("-" * 70)
-        print("=" * 70 + "\n")
+                print("-" * 75)
+        print("=" * 75 + "\n")
 
     def view_all_orders_menu(self, admin):
         all_orders = self.order_service.get_all_orders()
-        print("\n" + "=" * 80)
-        print(f"{'SYSTEM ORDERS REPORT':^80}")
-        print("=" * 80)
+        print("\n" + "=" * 90)
+        print(f"{'SYSTEM ORDERS REPORT':^90}")
+        print("=" * 90)
         if not all_orders:
-            print(f"{'No orders placed in the system yet.':^80}")
+            print(f"{'No orders placed in the system yet.':^90}")
         else:
             for o in all_orders:
-                print(f"Order #{o['order_id']} | User: {o['full_name']} | Date: {o['order_date']} | Total: ${o['total_price']:.2f}")
+                print(f"Order #{o['order_id']} | User: {o['full_name']} | Date: {o['order_date']} | Status: {o['status']} | Total: ${o['total_price']:.2f}")
                 print("  Items:")
                 for item in o["items"]:
                     print(f"    - {item['product_name']} (ID: {item['product_id']}) x{item['quantity']} @ ${float(item['price']):.2f}")
-                print("-" * 80)
-        print("=" * 80 + "\n")
+                print("-" * 90)
+        print("=" * 90 + "\n")
 
 
     def browse_orders_menu(self, admin):
@@ -124,7 +167,7 @@ class OrderController:
                 if not last_result.items:
                     print(f"{'No matching orders.':^80}")
                 for o in last_result.items:
-                    print(f"Order #{o['order_id']} | User: {o['full_name']} | Date: {o['order_date']} | Total: ${o['total_price']:.2f}")
+                    print(f"Order #{o['order_id']} | User: {o['full_name']} | Date: {o['order_date']} | Status: {o['status']} | Total: ${o['total_price']:.2f}")
                     print("  Items:")
                     for item in o["items"]:
                         print(f"    - {item['product_name']} (ID: {item['product_id']}) x{item['quantity']} @ ${float(item['price']):.2f}")
@@ -141,3 +184,12 @@ class OrderController:
 
             elif choice == 8:
                 return
+
+    def approve_order_menu(self, admin):
+        print("\n--- APPROVE ORDER ---")
+        order_id = get_int_input("Enter Order ID to approve: ", min_val=1)
+        try:
+            self.order_service.approve_order(order_id)
+            print(f"  [OK] Order #{order_id} has been successfully approved.")
+        except ValueError as e:
+            print(f"  [!] Operation failed: {e}")

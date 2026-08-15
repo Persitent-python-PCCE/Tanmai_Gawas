@@ -14,6 +14,7 @@ class Admin(User):
             "Bulk Upload Products",
             "View All Orders",
             "Search / Filter Orders",
+            "Approve Order",
             "Export Database (Backup)",
             "Logout"
         ]

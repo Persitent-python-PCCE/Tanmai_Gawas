@@ -53,7 +53,6 @@ class TestCart(unittest.TestCase):
         self.cart.add_item(self.prod1, 1)
         self.cart.add_item(self.prod2, 2)
         
-        # 1000 * 1 + 50 * 2 = 1100
         self.assertEqual(self.cart.get_total_price(), 1100.0)
 
     def test_get_summary(self):

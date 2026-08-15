@@ -85,6 +85,9 @@ class CustomerController:
             elif selected_option == "Search / Filter Orders":
                 self.order_controller.browse_orders_menu(admin)
 
+            elif selected_option == "Approve Order":
+                self.order_controller.approve_order_menu(admin)
+
             elif selected_option == "Export Database (Backup)":
                 self.export_database_menu(admin)
 
