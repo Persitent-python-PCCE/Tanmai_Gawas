@@ -37,3 +37,7 @@ class CartService:
     def get_cart_total(self, user_id):
         cart = self.get_user_cart(user_id)
         return cart.get_total_price()
+
+    def remove_items_from_cart(self, user_id, product_ids):
+        for pid in product_ids:
+            self.remove_from_cart(user_id, pid)

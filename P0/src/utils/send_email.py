@@ -1,10 +1,11 @@
+import os
 import smtplib
 from email.message import EmailMessage
 import hashlib
 import random
 
-sender_email = "sunitagawas580@gmail.com"
-app_password = "thbpduiejsshwuqi"
+sender_email = os.environ.get("EMAIL")
+app_password = os.environ.get("APP_PASSWORD")
 
 
 def send_otp_email(email):

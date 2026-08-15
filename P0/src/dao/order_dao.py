@@ -1,4 +1,4 @@
-from config.database import execute_query, get_connection
+from config.database import execute_query, get_connection, execute_update
 
 ALLOWED_ORDER_SORT_FIELDS = {"order_date", "total_price"}
 
@@ -93,3 +93,14 @@ class OrderDAO:
         """
         rows = execute_query(query, params + [spec.page_size, spec.offset])
         return rows, total
+
+    def get_order_by_id(self, order_id):
+        rows = execute_query("SELECT * FROM orders WHERE id = %s", (order_id,))
+        return rows[0] if rows else None
+
+    def update_order_status(self, order_id, status):
+        _, row_count = execute_update(
+            "UPDATE orders SET status = %s WHERE id = %s",
+            (status, order_id)
+        )
+        return row_count > 0

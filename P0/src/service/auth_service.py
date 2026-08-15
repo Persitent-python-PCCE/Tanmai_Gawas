@@ -49,32 +49,38 @@ class AuthService:
         return re.match(email_pattern, email) is not None
     
     def register_user(self, full_name, password, email, phone, address, date_of_birth, role="customer"):
-        full_name = full_name.strip()
-        email = email.strip()
-        date_of_birth = date_of_birth.strip()
+        if email:
+            email = email.strip()
+
+        if date_of_birth:
+            date_of_birth = date_of_birth.strip()
+
+        if full_name:
+            full_name = full_name.strip()
 
         if len(password) < 4:
             raise ValueError("Password must be at least 4 characters long.")
 
-        try:
-            dob = datetime.strptime(date_of_birth, "%Y-%m-%d").date()
-        except ValueError:
-            raise ValueError("Invalid date of birth. Use YYYY-MM-DD format.")
+        if date_of_birth:
+            try:
+                dob = datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+            except ValueError:
+                raise ValueError("Invalid date of birth. Use YYYY-MM-DD format.")
 
-        if dob > datetime.today().date():
-            raise ValueError("Date of birth cannot be in the future.")
+            if dob > datetime.today().date():
+                raise ValueError("Date of birth cannot be in the future.")
 
         if role not in ("customer", "admin"):
             raise ValueError("Invalid user role.")
 
-        existing = self.customer_dao.get_by_full_name(full_name)
+        existing = self.customer_dao.get_by_email(email)
 
         if existing:
             log_action(
-                f"Registration failed: full_name '{full_name}' already exists.",
+                f"Registration failed: Email '{email}' already exists.",
                 "warning"
             )
-            raise ValueError(f"full_name '{full_name}' is already taken.")
+            raise ValueError(f"Email '{email}' is already registered.")
 
         hashed_pw = self.hash_password(password)
 
@@ -90,7 +96,7 @@ class AuthService:
             )
 
             log_action(
-                f"User registered successfully: full_name='{full_name}', "
+                f"User registered successfully: Email='{email}', "
                 f"Role='{role}', ID={user_id}"
             )
 
