@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Create Course{% endblock %}
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 800px;">
+    <div class="mb-4">
+        <a href="{{ url_for('instructor_ui.dashboard') }}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 12px;">
+        <h2 class="h4 fw-bold mb-3">Create New Course</h2>
+        <p class="text-muted mb-4">Provide details below to publish a new course on the learning portal.</p>
+
+        <form action="{{ url_for('course.create_course') }}" method="post" class="stack">
+            <div class="mb-3">
+                <label for="title" class="form-label fw-semibold">Course Title</label>
+                <input type="text" class="form-control py-2" id="title" name="title" placeholder="e.g., Introduction to Python" required style="border-radius: 8px;">
+            </div>
+
+            <div class="mb-4">
+                <label for="description" class="form-label fw-semibold">Description</label>
+                <textarea class="form-control" id="description" name="description" placeholder="Provide a detailed description of what students will learn..." rows="5" style="border-radius: 8px;"></textarea>
+            </div>
+
+            <button type="submit" class="btn py-2 text-white fw-semibold w-100" style="background: var(--accent); border-radius: 8px;">
+                <i class="bi bi-plus-circle me-1"></i> Create and Publish
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

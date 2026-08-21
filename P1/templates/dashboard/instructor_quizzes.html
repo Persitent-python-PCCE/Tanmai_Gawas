@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Quiz Results{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1 text-gray-800">Quiz Results</h1>
+            <p class="text-muted mb-0">Monitor quiz attempts and scores for your students.</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 12px;">
+        {% if results_data %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student</th>
+                        <th>Quiz Title</th>
+                        <th>Course</th>
+                        <th>Score</th>
+                        <th>Submitted At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in results_data %}
+                    <tr>
+                        <td class="fw-semibold">{{ result.student_email }}</td>
+                        <td>{{ result.quiz_title }}</td>
+                        <td>{{ result.course_title }}</td>
+                        <td>
+                            <span class="fw-bold {% if result.score >= 70 %}text-success{% else %}text-danger{% endif %}">
+                                {{ result.score }}%
+                            </span>
+                        </td>
+                        <td class="text-muted">{{ result.submitted_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-question-circle fs-1 text-muted"></i>
+            <p class="text-muted mt-3">No student quiz attempts recorded yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

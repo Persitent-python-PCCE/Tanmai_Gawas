@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Progress{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Course Progress</h1>
+    <p>Completion: {{ progress.completion_percent }}%</p>
+</section>
+
+<section class="panel">
+    <div class="progress-track">
+        <div class="progress-fill" style="width: {{ progress.completion_percent }}%"></div>
+    </div>
+    <a href="{{ url_for('course.course_detail', course_id=course_id) }}">Back to course</a>
+</section>
+{% endblock %}

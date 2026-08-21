@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1 text-gray-800">Student Dashboard</h1>
+            <p class="text-muted mb-0">Welcome back, {{ user['email'] }}</p>
+        </div>
+        <a class="btn btn-primary" href="{{ url_for('course.list_courses') }}">
+            <i class="bi bi-journal-bookmark-fill me-2"></i>Browse Courses
+        </a>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm p-4 h-100 bg-white" style="border-radius: 12px;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-3 me-3" style="background: rgba(46, 125, 107, 0.1); color: var(--accent);">
+                        <i class="bi bi-book fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1 small fw-bold">Enrolled Courses</h6>
+                        <h2 class="mb-0 fw-bold">{{ enrolled_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm p-4 h-100 bg-white" style="border-radius: 12px;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-3 me-3" style="background: rgba(13, 110, 253, 0.1); color: #0d6efd;">
+                        <i class="bi bi-check-circle fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1 small fw-bold">Completed Courses</h6>
+                        <h2 class="mb-0 fw-bold">{{ completed_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm p-4 h-100 bg-white" style="border-radius: 12px;">
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle p-3 me-3" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                        <i class="bi bi-trophy fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1 small fw-bold">Avg Quiz Score</h6>
+                        <h2 class="mb-0 fw-bold">{{ avg_quiz_score }}%</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Progress & Quiz Performance -->
+    <div class="row g-4">
+        <!-- Progress -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm p-4 h-100 bg-white" style="border-radius: 12px;">
+                <h4 class="h5 fw-bold mb-4 text-gray-800 border-bottom pb-2">My Course Progress</h4>
+                <div class="stack">
+                    {% for course in course_progresses %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-semibold"><a href="{{ url_for('course.course_detail', course_id=course.id) }}" class="text-dark hover-accent">{{ course.title }}</a></span>
+                            <span class="badge" style="background: var(--accent-soft); color: var(--accent);">{{ course.percent }}%</span>
+                        </div>
+                        <div class="progress-track" style="height: 10px; background: #e9ecef; border-radius: 5px;">
+                            <div class="progress-fill" style="width: {{ course.percent }}%; height: 100%; background: var(--accent); border-radius: 5px; transition: width 0.6s ease;"></div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">You are not enrolled in any courses yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Attempts -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm p-4 h-100 bg-white" style="border-radius: 12px;">
+                <h4 class="h5 fw-bold mb-4 text-gray-800 border-bottom pb-2">Quiz Performance</h4>
+                {% if quiz_performances %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Quiz</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for quiz in quiz_performances %}
+                            <tr>
+                                <td class="fw-semibold text-dark">{{ quiz.title }}</td>
+                                <td>{{ quiz.score }}%</td>
+                                <td>
+                                    {% if quiz.status == 'Passed' %}
+                                    <span class="badge bg-success-subtle text-success px-3 py-2" style="border-radius: 30px;">Passed</span>
+                                    {% else %}
+                                    <span class="badge bg-danger-subtle text-danger px-3 py-2" style="border-radius: 30px;">Failed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <p class="text-muted mb-0">No quiz attempts yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-accent:hover {
+    color: var(--accent) !important;
+    text-decoration: underline !important;
+}
+.bg-success-subtle {
+    background-color: #d1e7dd !important;
+}
+.bg-danger-subtle {
+    background-color: #f8d7da !important;
+}
+</style>
+
+{% endblock %}

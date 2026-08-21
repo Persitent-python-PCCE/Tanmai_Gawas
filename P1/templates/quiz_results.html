@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Quiz Results{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Your Quiz Results</h1>
+</section>
+
+<section class="panel">
+  <ul class="link-list">
+    {% for r in results %}
+    <li>Quiz {{ r.quiz_id }} - Score: {{ r.score }} - Submitted at {{ r.submitted_at }}</li>
+    {% else %}
+    <li>No results yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

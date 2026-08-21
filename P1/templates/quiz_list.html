@@ -1,0 +1,22 @@
+{# templates/quiz_list.html #}
+{% extends "base.html" %}
+
+{% block title %}Quizzes{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>Quizzes for Course {{ course_id }}</h1>
+</section>
+
+<section class="panel">
+
+  <ul class="link-list">
+  {% for quiz in quizzes %}
+    <li>
+      <a href="{{ url_for('quiz.take_quiz', course_id=course_id, quiz_id=quiz.id) }}">{{ quiz.title }}</a>
+    </li>
+  {% else %}
+    <li>No quizzes available.</li>
+  {% endfor %}
+</ul>
+</section>
+{% endblock %}

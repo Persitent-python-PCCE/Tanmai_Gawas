@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Instructor Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <div>
+        <h1>Instructor Dashboard</h1>
+        <p>Overview of your courses, students, and quizzes</p>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="bi bi-journal-bookmark"></i></div>
+        <div>
+            <h3>Total Courses</h3>
+            <p>{{ stats.total_courses }}</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon icon-info"><i class="bi bi-people"></i></div>
+        <div>
+            <h3>Total Students</h3>
+            <p>{{ stats.total_students }}</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon icon-purple"><i class="bi bi-patch-question"></i></div>
+        <div>
+            <h3>Total Quizzes</h3>
+            <p>{{ stats.total_quizzes }}</p>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon icon-warn"><i class="bi bi-trophy"></i></div>
+        <div>
+            <h3>Average Score</h3>
+            <p>{{ "%.1f"|format(stats.average_score or 0) }}%</p>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid two-col">
+
+    <!-- Course Performance -->
+    <section class="panel">
+        <h2 class="panel-title">Course Performance</h2>
+
+        {% if stats.course_performance %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Students</th>
+                    <th>Avg Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in stats.course_performance %}
+                <tr>
+                    <td>{{ course.title }}</td>
+                    <td>{{ course.student_count }}</td>
+                    <td>{{ "%.1f"|format(course.avg_score or 0) }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No course performance data available.</p>
+        {% endif %}
+    </section>
+
+    <!-- Quiz Performance -->
+    <section class="panel">
+        <h2 class="panel-title">Quiz Performance</h2>
+
+        {% if stats.quiz_performance %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Quiz</th>
+                    <th>Attempts</th>
+                    <th>Avg Score</th>
+                    <th>Pass Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in stats.quiz_performance %}
+                <tr>
+                    <td>{{ quiz.title }}</td>
+                    <td>{{ quiz.attempts }}</td>
+                    <td>{{ "%.1f"|format(quiz.avg_score or 0) }}%</td>
+                    <td>{{ "%.1f"|format(quiz.pass_rate or 0) }}%</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-state">No quiz performance data available.</p>
+        {% endif %}
+    </section>
+
+</div>
+
+{% endblock %}

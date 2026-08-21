@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Your Courses{% endblock %}
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1 text-gray-800">Your Courses</h1>
+            <p class="text-muted mb-0">Manage modules, lessons, and quizzes for courses you teach.</p>
+        </div>
+        <a class="btn text-white" style="background: var(--accent);" href="{{ url_for('instructor_ui.create_course') }}">
+            <i class="bi bi-plus-circle me-1"></i>Create Course
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 12px;">
+        {% if taught_courses %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Course Title</th>
+                        <th>Description</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in taught_courses %}
+                    <tr>
+                        <td class="fw-semibold">{{ course.title }}</td>
+                        <td class="text-muted">{{ course.description or 'No description provided.' }}</td>
+                        <td class="text-end">
+                            <div class="btn-group gap-2">
+                                <a href="{{ url_for('course.course_detail', course_id=course.id) }}" class="btn btn-outline-secondary btn-sm" style="border-radius: 6px;">
+                                    <i class="bi bi-eye"></i> View Details
+                                </a>
+                                <a href="{{ url_for('quiz.create_quiz', course_id=course.id) }}" class="btn btn-outline-primary btn-sm" style="border-radius: 6px;">
+                                    <i class="bi bi-question-circle"></i> Create Quiz
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-journal-x fs-1 text-muted"></i>
+            <p class="text-muted mt-3">You are not teaching any courses yet.</p>
+            <a href="{{ url_for('instructor_ui.create_course') }}" class="btn text-white mt-2" style="background: var(--accent);">Create one now</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

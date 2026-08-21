@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Upload Material — {{ module.title }}{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Upload Material</h1>
+    <p>{{ module.title }}</p>
+</section>
+<section class="panel">
+    <form action="{{ url_for('material.upload_material', module_id=module.id) }}" method="post"
+        enctype="multipart/form-data" class="stack">
+        <input type="file" name="file" required>
+        <button type="submit">Upload Material</button>
+    </form>
+</section>
+{% endblock %}

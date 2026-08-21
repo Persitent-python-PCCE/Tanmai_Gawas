@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Materials{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Materials for Module {{ module.title }}</h1>
+</section>
+
+<section class="panel">
+    <ul class="link-list">
+        {% for material in materials %}
+        <li>
+            <span>{{ material.filename }}</span>
+            <a href="{{ url_for('material.download_material', course_id=course.id, module_id=module.id, filename=material.filename) }}">Download</a>
+        </li>
+        {% else %}
+        <li>No materials uploaded.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

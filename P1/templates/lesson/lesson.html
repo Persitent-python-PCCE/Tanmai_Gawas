@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }}{% endblock %}
+{% block content %}
+<article class="panel lesson">
+    <h1>{{ lesson.title }}</h1>
+    <div>{{ lesson.content|safe }}</div>
+</article>
+
+{% if g.current_user and g.current_user.role == 'student' %}
+<form action="{{ url_for('lesson.complete_lesson', module_id=lesson.module_id, lesson_id=lesson.id) }}" method="post">
+    <button type="submit">Mark Complete</button>
+</form>
+{% endif %}
+{% endblock %}

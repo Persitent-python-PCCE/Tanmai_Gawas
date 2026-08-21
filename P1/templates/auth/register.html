@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<section class="auth-panel">
+    <h1>Register</h1>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form action="{{ url_for('auth.register') }}" method="post" class="stack">
+        <input type="email" id="email" name="email" placeholder="Email" required>
+        <input type="password" id="password" name="password" placeholder="Password" minlength="8" required>
+        <select id="role" name="role">
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+            <option value="admin">Admin</option>
+        </select>
+        <button type="submit">Create Account</button>
+    </form>
+
+    <p>Already registered? <a href="{{ url_for('auth.login') }}">Login</a></p>
+</section>
+{% endblock %}

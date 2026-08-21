@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Courses{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>Courses</h1>
+    <form method="get" action="{{ url_for('course.list_courses') }}" class="inline-form">
+        <input type="search" name="q" value="{{ query or '' }}" placeholder="Search courses">
+        <button type="submit">Search</button>
+    </form>
+</section>
+
+<section class="grid">
+    {% for course in courses %}
+    <article class="card">
+            <a href="{{ url_for('course.course_detail', course_id=course.id) }}">
+                {{ course.title }}
+            </a>
+        </h2>
+        <p>{{ course.description or 'No description yet.' }}</p>
+        {% if g.current_user and g.current_user.role == 'student' %}
+        <form action="{{ url_for('enroll_ui.enroll', course_id=course.id) }}" method="post">
+            <button type="submit">Enroll</button>
+        </form>
+        {% endif %}
+    </article>
+    {% else %}
+    <p>No courses found.</p>
+    {% endfor %}
+</section>
+{% endblock %}

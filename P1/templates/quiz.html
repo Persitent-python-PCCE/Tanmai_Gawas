@@ -1,0 +1,25 @@
+{# templates/quiz.html #}
+{% extends "base.html" %}
+
+{% block title %}{{ quiz.title }}{% endblock %}
+{% block content %}
+<section class="page-header">
+  <h1>{{ quiz.title }}</h1>
+</section>
+
+<form method="post" action="{{ url_for('quiz.attempt_quiz', course_id=course_id, quiz_id=quiz.id) }}">
+  {% for q in questions %}
+    <div class="question">
+      <p><strong>Question {{ loop.index }}:</strong> {{ q.prompt }}</p>
+      {% set opts = q.get_options() %}
+      {% for opt in opts %}
+        <div>
+          <input type="radio" name="q{{ q.id }}" value="{{ loop.index0 }}" required>
+          {{ opt.option }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  <button type="submit">Submit</button>
+</form>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}My Enrollments{% endblock %}
+{% block content %}
+<section class="page-header">
+    <h1>My Enrollments</h1>
+</section>
+
+<section class="panel">
+    <ul class="link-list">
+        {% for enrollment in enrollments %}
+        <li>Course ID: {{ enrollment.course_id }} - Course Title: {{ enrollment.course.title }} - Enrolled on {{ enrollment.enrolled_at }}</li>
+        {% else %}
+        <li>You have no enrollments.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}
