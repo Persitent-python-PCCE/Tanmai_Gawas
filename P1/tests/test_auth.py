@@ -22,6 +22,8 @@ def client(app):
 def test_register_v1_success(client):
     """Test v1 register endpoint"""
     resp = client.post('/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'test@example.com',
         'password': 'password123',
         'role': 'student'
@@ -38,6 +40,8 @@ def test_register_v1_missing_fields(client):
 def test_register_v2_success(client):
     """Test v2 register endpoint"""
     resp = client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'test2@example.com',
         'password': 'password123',
         'role': 'student'
@@ -56,6 +60,8 @@ def test_register_v2_missing_fields(client):
 def test_login_v1_success(client):
     """Test v1 login endpoint"""
     client.post('/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'login@example.com',
         'password': 'pass1234',
         'role': 'student'
@@ -71,6 +77,8 @@ def test_login_v1_success(client):
 def test_login_v2_success(client):
     """Test v2 login endpoint"""
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'login2@example.com',
         'password': 'pass1234',
         'role': 'student'
@@ -98,6 +106,8 @@ def test_login_failure(client):
 def test_me_endpoint(client):
     """Test /api/v2/auth/me endpoint"""
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'me@example.com',
         'password': 'pass1234',
         'role': 'instructor'
@@ -117,6 +127,8 @@ def test_me_endpoint(client):
 def test_logout_endpoint(client):
     """Test /api/v2/auth/logout endpoint"""
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'logout@example.com',
         'password': 'pass1234',
         'role': 'student'

@@ -40,6 +40,8 @@ def get_admin_headers(client):
 def get_student_headers(client):
     """Get student authentication headers"""
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'student@example.com',
         'password': 'StudPass1',
         'role': 'student'

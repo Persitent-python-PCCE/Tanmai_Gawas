@@ -21,6 +21,8 @@ def client(app):
 def register_and_get_token(client, email, password, role='student'):
     """Helper to register and get JWT token"""
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': email,
         'password': password,
         'role': role
@@ -34,12 +36,16 @@ def register_and_get_token(client, email, password, role='student'):
 def test_register_duplicate(client):
     # first registration
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'dup@example.com',
         'password': 'strongpass',
         'role': 'student'
     })
     # duplicate
     resp = client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'dup@example.com',
         'password': 'another',
         'role': 'student'

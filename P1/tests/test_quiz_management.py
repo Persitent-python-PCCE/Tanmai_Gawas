@@ -25,6 +25,8 @@ def client(app):
 
 def get_instructor_headers(client):
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'instr@example.com',
         'password': 'Pass123',
         'role': 'instructor'
@@ -38,6 +40,8 @@ def get_instructor_headers(client):
 
 def get_student_headers(client):
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'stud3@example.com',
         'password': 'Pass123',
         'role': 'student'
@@ -51,6 +55,8 @@ def get_student_headers(client):
 
 def get_admin_headers(client):
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'admin_quiz@example.com',
         'password': 'AdminPass1',
         'role': 'admin'

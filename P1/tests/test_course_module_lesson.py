@@ -233,6 +233,8 @@ def test_student_cannot_create_course(client):
     """Test that students cannot create courses"""
     # Register and login as student
     client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education',
         'email': 'student@example.com',
         'password': 'StrongPass1',
         'role': 'student'

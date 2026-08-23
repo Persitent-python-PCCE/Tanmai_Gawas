@@ -18,7 +18,9 @@ def client(app):
     return app.test_client()
 
 def register_user(client, email: str, password: str, role: str = 'student'):
-    return client.post('/api/v2/auth/register', json={'email': email, 'password': password, 'role': role})
+    return client.post('/api/v2/auth/register', json={
+        'full_name': 'Test User',
+        'education': 'Test Education','email': email, 'password': password, 'role': role})
 
 def login_user(client, email: str, password: str):
     return client.post('/api/v2/auth/login', json={'email': email, 'password': password})
