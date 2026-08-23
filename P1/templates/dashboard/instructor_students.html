@@ -1,40 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Enrolled Students{% endblock %}
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-1 text-gray-800">Enrolled Students</h1>
-            <p class="text-muted mb-0">Students currently enrolled in courses taught by you.</p>
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div>
+                <h1 class="page-title">Enrolled Students</h1>
+                <p class="page-subtitle">Students currently enrolled in courses taught by you.</p>
+            </div>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 12px;">
+    <div class="card">
         {% if students_data %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Student Email</th>
-                        <th>Course</th>
-                        <th>Enrolled At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students_data %}
-                    <tr>
-                        <td class="fw-semibold">{{ student.email }}</td>
-                        <td>{{ student.course_title }}</td>
-                        <td class="text-muted">{{ student.enrolled_at }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Course</th>
+                            <th>Enrolled At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students_data %}
+                        <tr>
+                            <td class="fw-semibold">{{ student.email }}</td>
+                            <td>{{ student.course_title }}</td>
+                            <td class="text-muted">{{ student.enrolled_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-people fs-1 text-muted"></i>
-            <p class="text-muted mt-3">No students enrolled in your courses yet.</p>
+        <div class="empty-state">
+            <i class="bi bi-people empty-state-icon"></i>
+            <h4 class="empty-state-title">No Students Enrolled</h4>
+            <p class="empty-state-text">No students have enrolled in your courses yet.</p>
         </div>
         {% endif %}
     </div>

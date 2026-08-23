@@ -12,7 +12,6 @@ def register_blueprints(app):
     from .progress_controller import progress_bp
     from .enrollment_controller import enroll_bp
     from .enrollment_ui_controller import enroll_ui_bp
-    from .admin_controller import admin_bp
     from .admin_course_controller import admin_course_bp
     from .admin_ui_controller import admin_ui_bp
     from .dashboard_controller import dashboard_bp

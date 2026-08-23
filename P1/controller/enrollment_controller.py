@@ -14,6 +14,7 @@ from service.enrollment_service import (
     list_my_enrollments,
     list_course_enrollments,
 )
+from utils.role_check import _ensure_student
 
 enroll_bp = Blueprint("enrollment", __name__)
 
@@ -40,6 +41,7 @@ def unenroll(course_id):
 @enroll_bp.route("/my/enrollments", methods=["GET"])
 def my_enrollments():
     try:
+        _ensure_student()
         enrolls = list_my_enrollments()
         payload = [
             {"course_id": e.course_id, "enrolled_at": e.enrolled_at.isoformat()}

@@ -2,15 +2,12 @@ import logging
 import os
 
 
-def _log_action(message, level, log_file):
-    # Create logs directory if it doesn't exist
+def log_action(message, level, log_file):
     os.makedirs("logs", exist_ok=True)
 
-    # Create logger
     logger = logging.getLogger(log_file)
     logger.setLevel(logging.DEBUG)
 
-    # Avoid adding multiple handlers
     if not logger.handlers:
         handler = logging.FileHandler(log_file)
         handler.setLevel(logging.DEBUG)
@@ -22,7 +19,6 @@ def _log_action(message, level, log_file):
         handler.setFormatter(formatter)
         logger.addHandler(handler)
 
-    # Log according to level
     if level == "debug":
         logger.debug(message)
     elif level == "info":
@@ -38,16 +34,16 @@ def _log_action(message, level, log_file):
 
 
 def log_general_action(message, level):
-    _log_action(message, level, "logs/general.log")
+    log_action(message, level, "logs/general.log")
 
 
 def log_admin_action(message, level):
-    _log_action(message, level, "logs/admin.log")
+    log_action(message, level, "logs/admin.log")
 
 
 def log_instructor_action(message, level):
-    _log_action(message, level, "logs/instructor.log")
+    log_action(message, level, "logs/instructor.log")
 
 
 def log_student_action(message, level):
-    _log_action(message, level, "logs/student.log")
+    log_action(message, level, "logs/student.log")

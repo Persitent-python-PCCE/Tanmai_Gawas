@@ -2,11 +2,13 @@ from config.db import db
 from models.user import User
 
 
-def create_user(email, password_hash, role='student'):
+def create_user(email, password_hash, role='student', full_name=None, education=None):
     user = User(
         email=email,
         password_hash=password_hash,
-        role=role
+        role=role,
+        full_name=full_name,
+        education=education
     )
 
     db.session.add(user)

@@ -1,14 +1,10 @@
-from flask import Blueprint, render_template, g, redirect, url_for
+from flask import Blueprint, render_template, g, redirect, url_for, request
 from service.course_service import list_courses_service
 from service.dashboard_service import get_instructor_dashboard_service
+from service.quiz_service import get_instructor_students_service, get_instructor_quiz_results_paginated_service
+from service.user_service import get_user_by_id_service
 from utils.jwt_util import jwt_required
 from utils.role_check import _ensure_instructor
-from config.db import db
-from models.enrollment import Enrollment
-from models.user import User
-from models.course import Course
-from models.quiz import Quiz
-from models.quiz_result import QuizResult
 
 instructor_ui_bp = Blueprint('instructor_ui', __name__)
 
@@ -19,6 +15,7 @@ def dashboard():
 
     user = g.current_user
     instructor_id = int(user['sub'])
+    full_name = get_user_by_id_service(instructor_id).to_dict()["full_name"]
     courses, course_count = list_courses_service()
 
     taught_courses = [c for c in courses if c.instructor_id == instructor_id]
@@ -27,6 +24,7 @@ def dashboard():
     return render_template(
         'dashboard/instructor_dashboard.html',
         taught_courses=taught_courses,
+        full_name=full_name,
         user=user,
         stats=stats
     )
@@ -58,15 +56,8 @@ def students():
     user = g.current_user
     instructor_id = int(user['sub'])
     
-    # Query students enrolled in this instructor's courses
-    enrollments = db.session.query(Enrollment, User, Course).join(
-        User, Enrollment.user_id == User.id
-    ).join(
-        Course, Enrollment.course_id == Course.id
-    ).filter(
-        Course.instructor_id == instructor_id
-    ).all()
-
+    enrollments = get_instructor_students_service(instructor_id)
+    
     students_data = []
     for enroll, stu, crs in enrollments:
         students_data.append({
@@ -88,20 +79,19 @@ def quiz_results():
     user = g.current_user
     instructor_id = int(user['sub'])
 
-    # Query quiz results for courses taught by this instructor
-    results = db.session.query(QuizResult, User, Quiz, Course).join(
-        User, QuizResult.student_id == User.id
-    ).join(
-        Quiz, QuizResult.quiz_id == Quiz.id
-    ).join(
-        Course, Quiz.course_id == Course.id
-    ).filter(
-        Course.instructor_id == instructor_id
-    ).order_by(QuizResult.submitted_at.desc()).all()
+    # Pagination and search parameters
+    PAGE_SIZE = 10
+    page = int(request.args.get('page', 1))
+    search = request.args.get('search', '').strip()
+
+    data = get_instructor_quiz_results_paginated_service(instructor_id, page, PAGE_SIZE, search)
 
     results_data = []
-    for r, stu, q, crs in results:
+    for r, stu, q, crs in data['results']:
         results_data.append({
+            "result_id": r.id,
+            "quiz_id": q.id,
+            "course_id": crs.id,
             "student_email": stu.email,
             "quiz_title": q.title,
             "course_title": crs.title,
@@ -112,5 +102,8 @@ def quiz_results():
     return render_template(
         'dashboard/instructor_quizzes.html',
         results_data=results_data,
-        user=user
+        user=user,
+        page=data['page'],
+        total_pages=data['total_pages'],
+        search=search
     )

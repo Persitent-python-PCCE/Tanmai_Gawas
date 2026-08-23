@@ -4,6 +4,9 @@ from flask import Blueprint, flash, make_response, redirect, request, jsonify, s
 from service.auth_service import register_user, authenticate_user, logout_user
 from flask_login import login_user, logout_user as flask_logout, login_required, current_user
 
+from utils.jwt_util import create_access_token
+from utils.logger import log_general_action
+
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST','GET'])
@@ -40,6 +43,7 @@ def login():
             role=user.role,
             email=user.email
         )
+        log_general_action(f"[OK] User Logged In Successfully with email {user.email}", "info")
         response = make_response(jsonify({'message': 'Logged in', 'token': token}))
         response.set_cookie(
             'access_token',
@@ -68,7 +72,6 @@ def login_jwt():
             'error': 'Invalid credentials'
         }), 401
 
-    from utils.jwt_util import create_access_token
 
     token = create_access_token(
         user_id=user.id,
@@ -87,7 +90,7 @@ def login_jwt():
         'access_token',
         token,
         httponly=True,
-        secure=False,       # True when using HTTPS
+        secure=False,
         samesite='Lax'
     )
 

@@ -1,6 +1,7 @@
 import time
 from flask import Blueprint, render_template, redirect, url_for, g
 from flask_login import current_user, login_required
+from service.user_service import get_user_by_id_service
 from utils.jwt_util import jwt_required
 
 class SimpleCache:
@@ -29,6 +30,7 @@ def home():
     role = user['role']
     email = user['email']
     user_id = int(user['sub'])
+    full_name = get_user_by_id_service(user_id).to_dict()["full_name"]
 
     if role == 'student':
         cache_key = f"student_dash_{user_id}"
@@ -67,6 +69,9 @@ def home():
             for r in quiz_results:
                 status = "Passed" if r.score >= 70.0 else "Failed"
                 quiz_performances.append({
+                    "id": r.id,
+                    "quiz_id": r.quiz_id,
+                    "course_id": r.quiz.course_id,
                     "title": r.quiz.title,
                     "score": int(r.score),
                     "status": status
@@ -78,7 +83,8 @@ def home():
             "completed_count": completed_count,
             "avg_quiz_score": round(avg_score, 1),
             "course_progresses": course_progresses,
-            "quiz_performances": quiz_performances
+            "quiz_performances": quiz_performances,
+            "full_name": full_name
         }
 
         student_cache.set(cache_key, data_to_render, timeout=10)

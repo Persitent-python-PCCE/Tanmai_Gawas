@@ -1,48 +1,88 @@
 {% extends "base.html" %}
 {% block title %}Quiz Results{% endblock %}
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h3 mb-1 text-gray-800">Quiz Results</h1>
-            <p class="text-muted mb-0">Monitor quiz attempts and scores for your students.</p>
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="page-header-content">
+            <div>
+                <h1 class="page-title">Quiz Results</h1>
+                <p class="page-subtitle">Monitor quiz attempts and scores for your students.</p>
+            </div>
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 12px;">
+    <!-- Search Form -->
+    <form method="get" class="mb-4 d-flex gap-2 flex-wrap">
+        <input type="text" name="search" class="form-control" placeholder="Search students..." value="{{ search|default('') }}" style="min-width: 250px;">
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if search %}
+        <a href="{{ url_for('instructor_ui.quiz_results') }}" class="btn btn-outline-secondary">Clear</a>
+        {% endif %}
+    </form>
+
+    <div class="card">
         {% if results_data %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Student</th>
-                        <th>Quiz Title</th>
-                        <th>Course</th>
-                        <th>Score</th>
-                        <th>Submitted At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for result in results_data %}
-                    <tr>
-                        <td class="fw-semibold">{{ result.student_email }}</td>
-                        <td>{{ result.quiz_title }}</td>
-                        <td>{{ result.course_title }}</td>
-                        <td>
-                            <span class="fw-bold {% if result.score >= 70 %}text-success{% else %}text-danger{% endif %}">
-                                {{ result.score }}%
-                            </span>
-                        </td>
-                        <td class="text-muted">{{ result.submitted_at }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Quiz Title</th>
+                            <th>Course</th>
+                            <th>Score</th>
+                            <th>Submitted At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for result in results_data %}
+                        <tr>
+                            <td class="fw-semibold">{{ result.student_email }}</td>
+                            <td>{{ result.quiz_title }}</td>
+                            <td>{{ result.course_title }}</td>
+                            <td>
+                                <span class="fw-bold {% if result.score >= 70 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ result.score }}%
+                                </span>
+                            </td>
+                            <td class="text-muted">{{ result.submitted_at }}</td>
+                            <td>
+                                <a href="{{ url_for('quiz.review_quiz_result', course_id=result.course_id, quiz_id=result.quiz_id, result_id=result.result_id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye me-1"></i> Review
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+        <!-- Pagination Controls -->
+        {% if total_pages > 1 %}
+        <div class="card-footer">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('instructor_ui.quiz_results', page=page-1, search=search) }}" tabindex="-1">Previous</a>
+                    </li>
+                    {% for p in range(1, total_pages + 1) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('instructor_ui.quiz_results', page=p, search=search) }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="page-item {% if page >= total_pages %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('instructor_ui.quiz_results', page=page+1, search=search) }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
         {% else %}
-        <div class="text-center py-5">
-            <i class="bi bi-question-circle fs-1 text-muted"></i>
-            <p class="text-muted mt-3">No student quiz attempts recorded yet.</p>
+        <div class="empty-state">
+            <i class="bi bi-question-circle empty-state-icon"></i>
+            <h4 class="empty-state-title">No Quiz Attempts</h4>
+            <p class="empty-state-text">No student quiz attempts recorded yet.</p>
         </div>
         {% endif %}
     </div>

@@ -6,6 +6,7 @@ from config.db import db
 from utils.error_handler import register_error_handlers
 from middleware.auth_middleware import jwt_middleware
 from controller.register_blueprints import register_blueprints
+from controller.v2.register_blueprints_v2 import register_v2_blueprints
 import os
 
 def create_app(config_class=None):
@@ -55,6 +56,9 @@ def create_app(config_class=None):
 
     # Register blueprints (registers all root and UI/admin blueprints)
     register_blueprints(app)
+
+    # Register v2 API blueprints (JSON only)
+    register_v2_blueprints(app)
 
     # Register error handlers
     register_error_handlers(app)

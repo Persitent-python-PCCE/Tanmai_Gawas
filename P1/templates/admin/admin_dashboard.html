@@ -4,293 +4,159 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin Dashboard</title>
-
-    <!-- Bootstrap 5 (CSS + Icons) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
-    <style>
-        :root {
-            --sidebar-bg: #14213d;
-            --sidebar-bg-active: #1f3357;
-            --accent: #2e7d6b;
-            --accent-soft: #e6f0ee;
-            --page-bg: #f5f6f8;
-            --text-muted: #6b7280;
-        }
-
-        body {
-            background-color: var(--page-bg);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        /* ---------- Sidebar ---------- */
-        .sidebar {
-            width: 240px;
-            min-height: 100vh;
-            background-color: var(--sidebar-bg);
-        }
-
-        .sidebar .brand {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .sidebar .brand-mark {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            background-color: var(--accent);
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.75);
-            padding: 0.65rem 1.5rem;
-            font-size: 0.925rem;
-            border-left: 3px solid transparent;
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-        }
-
-        .sidebar .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #fff;
-        }
-
-        .sidebar .nav-link.active {
-            background-color: var(--sidebar-bg-active);
-            border-left-color: var(--accent);
-            color: #fff;
-            font-weight: 500;
-        }
-
-        .sidebar .nav-link i {
-            font-size: 1.05rem;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* ---------- Topbar ---------- */
-        .topbar {
-            background-color: #fff;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 0.75rem 1.5rem;
-        }
-
-        .topbar .breadcrumb {
-            margin-bottom: 0;
-            font-size: 0.85rem;
-        }
-
-        /* ---------- Content ---------- */
-        .stat-card {
-            background-color: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 1.25rem 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
-
-        .stat-card .stat-value {
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .stat-card .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .panel-card {
-            background-color: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 1.5rem;
-            height: 100%;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-        }
-
-        .btn-accent {
-            background-color: var(--accent);
-            color: #fff;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .btn-accent:hover {
-            background-color: #256657;
-            color: #fff;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
 </head>
 <body>
-
-    <div class="d-flex">
-
-        <aside class="sidebar d-flex flex-column">
-            <div class="brand d-flex align-items-center gap-2">
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
                 <span class="brand-mark">LMS</span>
-                <span class="text-white fw-semibold">Admin Panel</span>
+                <span class="brand-title">Admin Panel</span>
             </div>
-
-            <nav class="nav flex-column mt-2">
+            <nav class="side-nav">
                 <a class="nav-link active" href="{{ url_for('admin_ui.dashboard') }}">
-                    <i class="bi bi-grid"></i> Dashboard
+                    <i class="bi bi-grid"></i> <span>Dashboard</span>
                 </a>
                 <a class="nav-link" href="{{ url_for('admin_ui.list_users') }}">
-                    <i class="bi bi-people"></i> User Management
+                    <i class="bi bi-people"></i> <span>User Management</span>
                 </a>
                 <a class="nav-link" href="{{ url_for('admin_course.list_admin_courses') }}">
-                    <i class="bi bi-journal-bookmark"></i> Course Management
+                    <i class="bi bi-journal-bookmark"></i> <span>Course Management</span>
                 </a>
             </nav>
         </aside>
 
-        <div class="flex-grow-1">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-            <!-- Topbar -->
-            <header class="topbar d-flex justify-content-between align-items-center">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item text-muted">Admin</li>
-                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                    </ol>
-                </nav>
-
-                <div class="dropdown">
-                    <button class="btn btn-sm btn-light dropdown-toggle d-flex align-items-center gap-2"
-                            type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i>
-                        Admin Portal
+        <div class="main-shell">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle navigation">
+                        <i class="bi bi-list"></i>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><form action="{{ url_for('auth.logout') }}" method="post">
-                            <button type="submit" class="btn-link-danger"><i class="bi bi-box-arrow-right"></i>
-                                Logout</button>
-                        </form></li>
-                    </ul>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item text-muted">Admin</li>
+                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="user-menu">
+                    <div class="user-avatar">A</div>
+                    <form action="{{ url_for('auth.logout') }}" method="post">
+                        <button type="submit" class="btn-icon" title="Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </button>
+                    </form>
                 </div>
             </header>
 
-            <!-- Page content -->
-            <main class="p-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h1 class="h3 mb-1 text-gray-800">Admin Dashboard</h1>
-                        <p class="text-muted mb-0">Overview of platform metrics and activities.</p>
+            <main class="page-content">
+                <div class="page-header">
+                    <div class="page-header-content">
+                        <div>
+                            <h1 class="page-title">Admin Dashboard</h1>
+                            <p class="page-subtitle">Overview of platform metrics and activities.</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Stats grid -->
-                <div class="row g-3 mb-4">
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="stat-card d-flex align-items-center">
-                            <div class="rounded-circle p-3 me-3" style="background: rgba(46, 125, 107, 0.1); color: var(--accent);">
-                                <i class="bi bi-people fs-4"></i>
-                            </div>
-                            <div>
-                                <div class="stat-label">Users</div>
-                                <div class="stat-value">{{ total_users }}</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon primary"><i class="bi bi-people"></i></div>
+                            <div class="stat-content">
+                                <p class="stat-label">Users</p>
+                                <p class="stat-value">{{ total_users }}</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="stat-card d-flex align-items-center">
-                            <div class="rounded-circle p-3 me-3" style="background: rgba(13, 110, 253, 0.1); color: #0d6efd;">
-                                <i class="bi bi-journal-bookmark fs-4"></i>
-                            </div>
-                            <div>
-                                <div class="stat-label">Courses</div>
-                                <div class="stat-value">{{ course_count }}</div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon secondary"><i class="bi bi-journal-bookmark"></i></div>
+                            <div class="stat-content">
+                                <p class="stat-label">Courses</p>
+                                <p class="stat-value">{{ course_count }}</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="stat-card d-flex align-items-center">
-                            <div class="rounded-circle p-3 me-3" style="background: rgba(25, 135, 84, 0.1); color: #198754;">
-                                <i class="bi bi-bookmark-check fs-4"></i>
-                            </div>
-                            <div>
-                                <div class="stat-label">Enrollments</div>
-                                <div class="stat-value">{{ enrollment_count }}</div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon success"><i class="bi bi-bookmark-check"></i></div>
+                            <div class="stat-content">
+                                <p class="stat-label">Enrollments</p>
+                                <p class="stat-value">{{ enrollment_count }}</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-lg-3">
-                        <div class="stat-card d-flex align-items-center">
-                            <div class="rounded-circle p-3 me-3" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
-                                <i class="bi bi-award fs-4"></i>
-                            </div>
-                            <div>
-                                <div class="stat-label">Quiz Attempts</div>
-                                <div class="stat-value">{{ quiz_attempts_count }}</div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-icon warning"><i class="bi bi-award"></i></div>
+                            <div class="stat-content">
+                                <p class="stat-label">Quiz Attempts</p>
+                                <p class="stat-value">{{ quiz_attempts_count }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- User Distribution & Quiz Analytics -->
-                <div class="row g-4 mb-4">
+                <div class="grid grid-2">
                     <!-- User Distribution -->
-                    <div class="col-12 col-lg-6">
-                        <div class="panel-card">
-                            <h5 class="fw-bold mb-4 border-bottom pb-2">User Distribution</h5>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span class="fw-semibold">Students</span>
-                                    <span>{{ student_count }}</span>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-header-title">User Distribution</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-column gap-4">
+                                <div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-semibold">Students</span>
+                                        <span>{{ student_count }}</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-primary" role="progressbar" style="width: {{ (student_count / (total_users or 1) * 100)|int }}%"></div>
+                                    </div>
                                 </div>
-                                <div class="progress" style="height: 12px; border-radius: 6px;">
-                                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ (student_count / (total_users or 1) * 100)|int }}%; border-radius: 6px;"></div>
+                                <div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-semibold">Instructors</span>
+                                        <span>{{ instructor_count }}</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{ (instructor_count / (total_users or 1) * 100)|int }}%"></div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span class="fw-semibold">Instructors</span>
-                                    <span>{{ instructor_count }}</span>
-                                </div>
-                                <div class="progress" style="height: 12px; border-radius: 6px;">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ (instructor_count / (total_users or 1) * 100)|int }}%; border-radius: 6px;"></div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span class="fw-semibold">Admins</span>
-                                    <span>{{ admin_count }}</span>
-                                </div>
-                                <div class="progress" style="height: 12px; border-radius: 6px;">
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ (admin_count / (total_users or 1) * 100)|int }}%; border-radius: 6px;"></div>
+                                <div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="fw-semibold">Admins</span>
+                                        <span>{{ admin_count }}</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-warning" role="progressbar" style="width: {{ (admin_count / (total_users or 1) * 100)|int }}%"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Quiz Analytics -->
-                    <div class="col-12 col-lg-6">
-                        <div class="panel-card d-flex flex-column justify-content-between">
-                            <div>
-                                <h5 class="fw-bold mb-4 border-bottom pb-2">Quiz Analytics</h5>
-                                <div class="row g-3 py-3 text-center">
-                                    <div class="col-6">
-                                        <div class="p-3 bg-light rounded-3" style="border: 1px solid #e5e7eb;">
-                                            <h6 class="text-muted small fw-bold mb-2">Average Score</h6>
-                                            <h3 class="mb-0 fw-extrabold text-primary">{{ avg_quiz_score }}%</h3>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="p-3 bg-light rounded-3" style="border: 1px solid #e5e7eb;">
-                                            <h6 class="text-muted small fw-bold mb-2">Pass Rate</h6>
-                                            <h3 class="mb-0 fw-extrabold text-success">{{ quiz_pass_rate }}%</h3>
-                                        </div>
-                                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-header-title">Quiz Analytics</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="grid grid-2">
+                                <div class="p-4 rounded-lg" style="background: var(--color-secondary-light); border: 1px solid var(--color-secondary);">
+                                    <h6 class="text-muted fw-semibold mb-2">Average Score</h6>
+                                    <h3 class="fw-bold text-secondary mb-0">{{ avg_quiz_score }}%</h3>
+                                </div>
+                                <div class="p-4 rounded-lg" style="background: var(--color-success-light); border: 1px solid var(--color-success);">
+                                    <h6 class="text-muted fw-semibold mb-2">Pass Rate</h6>
+                                    <h3 class="fw-bold text-success mb-0">{{ quiz_pass_rate }}%</h3>
                                 </div>
                             </div>
                         </div>
@@ -298,35 +164,39 @@
                 </div>
 
                 <!-- Popular Courses -->
-                <div class="row g-4">
-                    <div class="col-12">
-                        <div class="panel-card">
-                            <h5 class="fw-bold mb-4 border-bottom pb-2">Most Popular Courses</h5>
-                            {% if popular_courses %}
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Rank</th>
-                                            <th>Course Title</th>
-                                            <th>Enrolled Students</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for course in popular_courses %}
-                                        <tr>
-                                            <td class="fw-bold">{{ loop.index }}</td>
-                                            <td class="fw-semibold text-dark">{{ course.title }}</td>
-                                            <td><span class="badge bg-primary px-3 py-2" style="border-radius: 30px;">{{ course.student_count }} Students</span></td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {% else %}
-                            <p class="text-muted text-center py-4">No course enrollment data available yet.</p>
-                            {% endif %}
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-header-title">Most Popular Courses</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if popular_courses %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Course Title</th>
+                                        <th>Enrolled Students</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for course in popular_courses %}
+                                    <tr>
+                                        <td class="fw-bold">{{ loop.index }}</td>
+                                        <td class="fw-semibold">{{ course.title }}</td>
+                                        <td><span class="badge badge-primary">{{ course.student_count }} Students</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="bi bi-journal-bookmark empty-state-icon"></i>
+                            <h4 class="empty-state-title">No Enrollment Data</h4>
+                            <p class="empty-state-text">Course enrollment data will appear here once students start enrolling.</p>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </main>
@@ -334,5 +204,26 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        }
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+
+        overlay.addEventListener('click', closeSidebar);
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 991.98) closeSidebar();
+        });
+    </script>
 </body>
 </html>

@@ -15,6 +15,7 @@ from service.user_service import (
     update_user_service,
     delete_user_service
 )
+from service.dashboard_service import get_admin_dashboard_service
 
 from utils.jwt_util import jwt_required
 from utils.role_check import _ensure_admin
@@ -28,64 +29,20 @@ admin_ui_bp = Blueprint('admin_ui', __name__)
 def dashboard():
     _ensure_admin()
     
-    from config.db import db
-    from models.user import User
-    from models.course import Course
-    from models.enrollment import Enrollment
-    from models.quiz_result import QuizResult
-    from sqlalchemy import func
-
-    # Core Counts
-    total_users = db.session.query(User).count()
-    course_count = db.session.query(Course).count()
-    enrollment_count = db.session.query(Enrollment).count()
-    quiz_attempts_count = db.session.query(QuizResult).count()
-
-    # User Distribution
-    student_count = db.session.query(User).filter_by(role='student').count()
-    instructor_count = db.session.query(User).filter_by(role='instructor').count()
-    admin_count = db.session.query(User).filter_by(role='admin').count()
-
-    # Most Popular Courses
-    popular_courses_query = db.session.query(
-        Course.title, func.count(Enrollment.id).label('student_count')
-    ).join(
-        Enrollment, Course.id == Enrollment.course_id
-    ).group_by(
-        Course.id
-    ).order_by(
-        func.count(Enrollment.id).desc()
-    ).limit(3).all()
-    
-    popular_courses = []
-    for title, count in popular_courses_query:
-        popular_courses.append({
-            "title": title,
-            "student_count": count
-        })
-
-    # Quiz Analytics
-    results = db.session.query(QuizResult.score).all()
-    avg_score = 0.0
-    pass_rate = 0.0
-    if results:
-        scores = [r[0] for r in results]
-        avg_score = sum(scores) / len(scores)
-        passed = sum(1 for s in scores if s >= 70.0)
-        pass_rate = (passed / len(scores)) * 100.0
+    stats = get_admin_dashboard_service()
 
     return render_template(
         'admin/admin_dashboard.html',
-        total_users=total_users,
-        course_count=course_count,
-        enrollment_count=enrollment_count,
-        quiz_attempts_count=quiz_attempts_count,
-        student_count=student_count,
-        instructor_count=instructor_count,
-        admin_count=admin_count,
-        popular_courses=popular_courses,
-        avg_quiz_score=round(avg_score, 1),
-        quiz_pass_rate=round(pass_rate, 1)
+        total_users=stats['total_users'],
+        course_count=stats['course_count'],
+        enrollment_count=stats['enrollment_count'],
+        quiz_attempts_count=stats['quiz_attempts_count'],
+        student_count=stats['student_count'],
+        instructor_count=stats['instructor_count'],
+        admin_count=stats['admin_count'],
+        popular_courses=stats['popular_courses'],
+        avg_quiz_score=stats['avg_quiz_score'],
+        quiz_pass_rate=stats['quiz_pass_rate']
     )
 
 

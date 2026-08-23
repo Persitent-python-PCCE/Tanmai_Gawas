@@ -19,79 +19,175 @@ from dao.quiz_dao import (
     submit_quiz_result,
     list_results_by_student,
     list_results_by_quiz,
+    get_quiz_result,
+    update_quiz_title,
+    update_question,
+    get_student_results_paginated,
+    get_instructor_quiz_results_paginated,
+    get_instructor_students,
 )
 from utils.role_check import _ensure_instructor, _ensure_student, get_current_user_id
-
-# ---------- Quiz CRUD ----------
-def create_quiz_service(course_id, data):
-    _ensure_instructor()
-    title = data.get("title")
-    if not title:
-        raise ValueError("Quiz title required")
-    return create_quiz(title, course_id, instructor_id=get_current_user_id())
-
-def get_quiz_service(quiz_id):
-    quiz = get_quiz(quiz_id)
-    if not quiz:
-        raise ValueError("Quiz not found")
-    return quiz
-
-def list_quizzes_service(course_id):
-    return list_quizzes_by_course(course_id)
+from service.enrollment_service import _ensure_instructor_or_admin
 
 
-def delete_quiz_service(quiz_id):
-    _ensure_instructor()
-    return delete_quiz(quiz_id)
+class QuizService:
+    """Encapsulates all quiz‑related business logic as instance methods."""
 
-# ---------- Question CRUD ----------
-def add_question_service(quiz_id, data):
-    _ensure_instructor()
-    prompt = data.get("prompt")
-    options = data.get("options")  # expects list of {"option": ..., "is_correct": bool}
-    if not prompt or not isinstance(options, list) or not options:
-        raise ValueError("Prompt and non‑empty options list required")
-    return create_question(quiz_id, prompt, options)
+    # ---------- Quiz CRUD ----------
+    def create_quiz_service(self, course_id, data):
+        _ensure_instructor()
+        title = data.get("title")
+        if not title:
+            raise ValueError("Quiz title required")
+        return create_quiz(title, course_id, instructor_id=get_current_user_id())
 
-def list_questions_service(quiz_id):
-    return list_questions_by_quiz(quiz_id)
+    def get_quiz_service(self, quiz_id):
+        quiz = get_quiz(quiz_id)
+        if not quiz:
+            raise ValueError("Quiz not found")
+        return quiz
 
-def delete_question_service(question_id):
-    _ensure_instructor()
-    return delete_question(question_id)
+    def list_quizzes_service(self, course_id):
+        return list_quizzes_by_course(course_id)
 
-# ---------- Student attempt ----------
-def submit_attempt_service(quiz_id, answers_dict):
-    _ensure_student()
-    # answers_dict: {question_id: chosen_index}
-    questions = list_questions_by_quiz(quiz_id)
-    if not questions:
-        raise ValueError("Quiz has no questions")
-    # Compute score
-    total = len(questions)
-    correct = 0
-    for q in questions:
-        chosen = answers_dict.get(str(q.id))  # keys may be strings from JSON payload
-        opts = q.get_options()
-        # Find the correct option index
-        correct_idx = next((i for i, o in enumerate(opts) if o.get("is_correct")), None)
-        if chosen is not None and int(chosen) == correct_idx:
-            correct += 1
-    score = correct / total * 100  # percentage
-    return submit_quiz_result(quiz_id, student_id=get_current_user_id(), answers_dict=answers_dict, score=score)
+    def delete_quiz_service(self, quiz_id):
+        _ensure_instructor()
+        return delete_quiz(quiz_id)
 
-def get_student_results_service():
-    _ensure_student()
-    return list_results_by_student(get_current_user_id())
+    # ---------- Question CRUD ----------
+    def add_question_service(self, quiz_id, data):
+        _ensure_instructor()
+        prompt = data.get("prompt")
+        options = data.get("options")  # expects list of {"option": ..., "is_correct": bool}
+        if not prompt or not isinstance(options, list) or not options:
+            raise ValueError("Prompt and non‑empty options list required")
+        return create_question(quiz_id, prompt, options)
 
-def get_quiz_results_service(quiz_id):
-    _ensure_instructor()
-    return list_results_by_quiz(quiz_id)
+    def list_questions_service(self, quiz_id):
+        return list_questions_by_quiz(quiz_id)
 
-def get_instructor_quiz_stats_service(instructor_id):
-    _ensure_instructor()
+    def delete_question_service(self, question_id):
+        _ensure_instructor()
+        return delete_question(question_id)
 
-    return {
-        "total_quizzes": count_quizzes_by_instructor(instructor_id),
-        "average_score": average_score_by_instructor(instructor_id)
-    }
+    # ---------- Student attempt ----------
+    def submit_attempt_service(self, quiz_id, answers_dict):
+        _ensure_student()
+        # answers_dict: {question_id: chosen_index}
+        questions = list_questions_by_quiz(quiz_id)
+        if not questions:
+            raise ValueError("Quiz has no questions")
+        total = len(questions)
+        correct = 0
+        for q in questions:
+            chosen = answers_dict.get(str(q.id))
+            opts = q.get_options()
+            correct_idx = next((i for i, o in enumerate(opts) if o.get("is_correct")), None)
+            if chosen is not None and int(chosen) == correct_idx:
+                correct += 1
+        score = correct / total * 100
+        return submit_quiz_result(quiz_id, student_id=get_current_user_id(), answers_dict=answers_dict, score=score)
+
+    def get_student_results_service(self):
+        _ensure_student()
+        return list_results_by_student(get_current_user_id())
+
+    def get_quiz_results_service(self, quiz_id):
+        _ensure_instructor_or_admin()
+        return list_results_by_quiz(quiz_id)
+
+    def get_instructor_quiz_stats_service(self, instructor_id):
+        _ensure_instructor()
+        return {
+            "total_quizzes": count_quizzes_by_instructor(instructor_id),
+            "average_score": average_score_by_instructor(instructor_id),
+        }
+
+    def update_quiz_service(self, quiz_id, title):
+        _ensure_instructor()
+        if not title:
+            raise ValueError("Quiz title required")
+        return update_quiz_title(quiz_id, title)
+
+    def update_question_service(self, question_id, data):
+        _ensure_instructor()
+        prompt = data.get("prompt")
+        options = data.get("options")
+        if not prompt or not isinstance(options, list) or not options:
+            raise ValueError("Prompt and non‑empty options list required")
+        return update_question(question_id, prompt, options)
+
+    def get_quiz_result_detail_service(self, result_id):
+        result = get_quiz_result(result_id)
+        if not result:
+            raise ValueError("Result not found")
+        return result
+
+    def get_student_results_paginated_service(self, page: int = 1, per_page: int = 10, search: str = None):
+        _ensure_student()
+        student_id = get_current_user_id()
+        return get_student_results_paginated(student_id, page, per_page, search)
+
+    def get_instructor_quiz_results_paginated_service(self, instructor_id: int, page: int = 1, per_page: int = 10, search: str = None):
+        _ensure_instructor_or_admin()
+        return get_instructor_quiz_results_paginated(instructor_id, page, per_page, search)
+
+    def get_instructor_students_service(self, instructor_id: int):
+        _ensure_instructor_or_admin()
+        return get_instructor_students(instructor_id)
+
+
+# Module‑level singleton for easy import elsewhere
+quiz_service = QuizService()
+
+# -------- Backward‑compatible function wrappers --------
+def create_quiz_service(*args, **kwargs):
+    return quiz_service.create_quiz_service(*args, **kwargs)
+
+def get_quiz_service(*args, **kwargs):
+    return quiz_service.get_quiz_service(*args, **kwargs)
+
+def list_quizzes_service(*args, **kwargs):
+    return quiz_service.list_quizzes_service(*args, **kwargs)
+
+def delete_quiz_service(*args, **kwargs):
+    return quiz_service.delete_quiz_service(*args, **kwargs)
+
+def add_question_service(*args, **kwargs):
+    return quiz_service.add_question_service(*args, **kwargs)
+
+def list_questions_service(*args, **kwargs):
+    return quiz_service.list_questions_service(*args, **kwargs)
+
+def delete_question_service(*args, **kwargs):
+    return quiz_service.delete_question_service(*args, **kwargs)
+
+def submit_attempt_service(*args, **kwargs):
+    return quiz_service.submit_attempt_service(*args, **kwargs)
+
+def get_student_results_service(*args, **kwargs):
+    return quiz_service.get_student_results_service(*args, **kwargs)
+
+def get_quiz_results_service(*args, **kwargs):
+    return quiz_service.get_quiz_results_service(*args, **kwargs)
+
+def get_instructor_quiz_stats_service(*args, **kwargs):
+    return quiz_service.get_instructor_quiz_stats_service(*args, **kwargs)
+
+def update_quiz_service(*args, **kwargs):
+    return quiz_service.update_quiz_service(*args, **kwargs)
+
+def update_question_service(*args, **kwargs):
+    return quiz_service.update_question_service(*args, **kwargs)
+
+def get_quiz_result_detail_service(*args, **kwargs):
+    return quiz_service.get_quiz_result_detail_service(*args, **kwargs)
+
+def get_student_results_paginated_service(*args, **kwargs):
+    return quiz_service.get_student_results_paginated_service(*args, **kwargs)
+
+def get_instructor_quiz_results_paginated_service(*args, **kwargs):
+    return quiz_service.get_instructor_quiz_results_paginated_service(*args, **kwargs)
+
+def get_instructor_students_service(*args, **kwargs):
+    return quiz_service.get_instructor_students_service(*args, **kwargs)

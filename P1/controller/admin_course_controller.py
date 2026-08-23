@@ -1,4 +1,5 @@
-from flask import Blueprint, abort, render_template, request, redirect, url_for, flash
+from flask import Blueprint, abort, g, render_template, request, redirect, url_for, flash
+from service.enrollment_service import _ensure_instructor_or_admin
 from utils.jwt_util import jwt_required
 from utils.role_check import _ensure_admin
 from service.course_service import admin_update_course_service, create_course_service, get_course_service, update_course, delete_course, get_course, list_courses, update_course_service
@@ -66,11 +67,13 @@ from service.user_service import get_all_instructors_service
 @jwt_required
 def edit_admin_course(course_id):
 
-    _ensure_admin()
+    _ensure_instructor_or_admin()
 
     course = get_course_service(course_id)
 
     instructors = get_all_instructors_service()
+
+    
 
     if request.method == 'GET':
         return render_template(
@@ -108,14 +111,18 @@ def edit_admin_course(course_id):
         }
     )
 
-    return redirect(
-        url_for('admin_course.list_admin_courses')
-    )
+
+    jwt_user = getattr(g, 'current_user', None)
+    if jwt_user:
+        if jwt_user.get('role') != 'admin':
+            return redirect(url_for('instructor_ui.courses'))
+        else:
+            return redirect(url_for('admin_course.list_admin_courses'))
 
 @admin_course_bp.route('/admin/courses/<int:course_id>/delete', methods=['POST'])
 @jwt_required
 def delete_admin_course(course_id):
-    _ensure_admin()
+    _ensure_instructor_or_admin()
     delete_course(course_id)
     flash('Course deleted', 'info')
     return redirect(url_for('admin_course.list_admin_courses'))

@@ -1,4 +1,4 @@
-from flask import g
+from flask import g, render_template
 
 
 def _ensure_admin():

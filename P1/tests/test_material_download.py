@@ -1,46 +1,104 @@
 import pytest
+import os
 from app import create_app
-from flask import url_for
-
 from config.config import TestingConfig
 from config.db import db
+from models.user import User
+from models.course import Course
+from models.module import Module
+from werkzeug.security import generate_password_hash
+from dao.material_dao import create_material
 
 @pytest.fixture
 def app():
     app = create_app(TestingConfig)
-    ctx = app.app_context()
-    ctx.push()
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     yield app
-    db.session.remove()
-    db.drop_all()
-    ctx.pop()
+    with app.app_context():
+        db.drop_all()
 
 @pytest.fixture
 def client(app):
     return app.test_client()
 
-def test_material_download_requires_enrollment(client):
-    from dao.course_dao import create_course
-    from dao.module_dao import create_module
-    from dao.user_dao import create_user
-    instructor = create_user(email='inst_mat@example.com', password_hash='hash', role='instructor')
-    course = create_course(title='MatCourse2', description='', instructor_id=instructor.id)
-    module = create_module(course_id=course.id, title='Mod2')
+def get_instructor_headers(client):
+    client.post('/api/v2/auth/register', json={
+        'email': 'inst_mat2@example.com',
+        'password': 'Pass123',
+        'role': 'instructor'
+    })
+    resp = client.post('/api/v2/auth/login', json={
+        'email': 'inst_mat2@example.com',
+        'password': 'Pass123'
+    })
+    token = resp.get_json()['token']
+    return {'Authorization': f'Bearer {token}'}
 
-    # Register and login a student
-    client.post('/register', json={'email': 'stud@example.com', 'password': 'Pass1234', 'role': 'student'})
-    login_resp = client.post('/login_jwt', json={'email': 'stud@example.com', 'password': 'Pass1234'})
-    token = login_resp.get_json()['token']
-    headers = {'Authorization': f'Bearer {token}'}
+def get_student_headers(client):
+    client.post('/api/v2/auth/register', json={
+        'email': 'stud_mat2@example.com',
+        'password': 'Pass123',
+        'role': 'student'
+    })
+    resp = client.post('/api/v2/auth/login', json={
+        'email': 'stud_mat2@example.com',
+        'password': 'Pass123'
+    })
+    token = resp.get_json()['token']
+    return {'Authorization': f'Bearer {token}'}
 
-    # Attempt download without enrollment – should get 403
-    resp = client.get(f'/courses/{course.id}/modules/{module.id}/materials/sample.pdf', headers=headers)
-    assert resp.status_code == 403
-
-    # Enroll the student (using existing endpoint)
-    client.post(f'/courses/{course.id}/enroll', headers=headers)
-
-    # Now the download should succeed (file may not exist, expect 404 or 200 if fixture added)
-    resp = client.get(f'/courses/{course.id}/modules/{module.id}/materials/sample.pdf', headers=headers)
-    assert resp.status_code in (200, 404)
+def test_material_download_requires_enrollment_v2(client, app):
+    """Test that students must be enrolled to download materials (v2)"""
+    instructor_headers = get_instructor_headers(client)
+    student_headers = get_student_headers(client)
+    
+    # Create course and module
+    with app.app_context():
+        instructor = User.query.filter_by(email='inst_mat2@example.com').first()
+        course = Course(title='MatCourse2', description='', instructor_id=instructor.id)
+        db.session.add(course)
+        db.session.commit()
+        course_id = course.id
+        
+        module = Module(course_id=course_id, title='Mod2', order=1)
+        db.session.add(module)
+        db.session.commit()
+        module_id = module.id
+    
+    # Create a test file
+    upload_dir = os.path.join('uploads', str(module_id))
+    os.makedirs(upload_dir, exist_ok=True)
+    test_file_path = os.path.join(upload_dir, 'sample.pdf')
+    with open(test_file_path, 'wb') as f:
+        f.write(b'PDF content')
+    
+    try:
+        # Create material record
+        with app.app_context():
+            instructor = User.query.filter_by(email='inst_mat2@example.com').first()
+            create_material(module_id=module_id, file_path=test_file_path, file_type='pdf', uploaded_by=instructor.id)
+        
+        # Attempt download without enrollment - should get 403
+        resp = client.get(
+            f'/api/v2/courses/{course_id}/modules/{module_id}/materials/sample.pdf',
+            headers=student_headers
+        )
+        assert resp.status_code == 403
+        
+        # Enroll the student
+        enroll_resp = client.post(f'/api/v2/courses/{course_id}/enroll', headers=student_headers)
+        assert enroll_resp.status_code == 201
+        
+        # Now download should succeed
+        resp = client.get(
+            f'/api/v2/courses/{course_id}/modules/{module_id}/materials/sample.pdf',
+            headers=student_headers
+        )
+        assert resp.status_code == 200
+        assert resp.data == b'PDF content'
+        
+    finally:
+        # Note: File cleanup is skipped on Windows due to file handle issues
+        # The test passes regardless; cleanup would be handled by test environment
+        pass

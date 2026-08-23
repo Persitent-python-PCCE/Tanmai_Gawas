@@ -6,7 +6,7 @@ from service.material_service import (
     list_materials_service,
     delete_material_service,
 )
-from service.enrollment_service import is_user_enrolled
+from service.enrollment_service import _ensure_instructor_or_admin, is_user_enrolled
 from werkzeug.utils import secure_filename
 from utils.role_check import get_current_user_id
 import os
@@ -16,6 +16,7 @@ material_bp = Blueprint('material', __name__)
 @material_bp.route('/modules/<int:module_id>/materials', methods=['POST'])
 @jwt_required
 def upload_material(module_id):
+    _ensure_instructor_or_admin()
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
@@ -38,6 +39,7 @@ def list_materials(module_id):
 
 @material_bp.route('/modules/<int:module_id>/upload_material', methods=['GET'])
 def upload_material_form(module_id):
+    _ensure_instructor_or_admin()
     module = get_module_service(module_id)
     return render_template(
         'material/upload_material.html',
@@ -47,6 +49,7 @@ def upload_material_form(module_id):
 
 @material_bp.route('/modules/<int:module_id>/materials/<int:material_id>', methods=['DELETE'])
 def delete_material(module_id, material_id):
+    _ensure_instructor_or_admin()
     try:
         delete_material_service(material_id)
         return jsonify({'message': 'Material deleted'}), 200
@@ -56,10 +59,6 @@ def delete_material(module_id, material_id):
 @material_bp.route('/courses/<int:course_id>/modules/<int:module_id>/materials/<path:filename>', methods=['GET'])
 @jwt_required
 def download_material(course_id, module_id, filename):
-    """Secure endpoint to download a material file.
-    Checks that the current user (session or JWT) is enrolled in the course before
-    serving the file from the ``uploads/<module_id>/`` directory.
-    """
     user_id = get_current_user_id()
     if not user_id:
         abort(401, description='Authentication required')

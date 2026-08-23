@@ -13,7 +13,8 @@ Routes (all under ``/courses/<course_id>/quizzes``):
 * GET    ``/<quiz_id>/results`` – instructor lists attempts for a quiz
 """
 
-from flask import Blueprint, request, jsonify, redirect, url_for, flash
+from flask import Blueprint, g, request, jsonify, redirect, url_for, flash, render_template
+from service.enrollment_service import _ensure_instructor_or_admin
 from utils.jwt_util import jwt_required
 from service.quiz_service import (
     create_quiz_service,
@@ -26,7 +27,12 @@ from service.quiz_service import (
     submit_attempt_service,
     get_student_results_service,
     get_quiz_results_service,
+    update_quiz_service,
+    update_question_service,
+    get_quiz_result_detail_service,
+    get_student_results_paginated_service,
 )
+from utils.role_check import get_current_user_id
 
 quiz_bp = Blueprint("quiz", __name__, url_prefix="/courses/<int:course_id>/quizzes")
 
@@ -44,13 +50,14 @@ from flask import render_template
 
 @quiz_bp.route("/view", methods=["GET"])
 def view_quizzes(course_id):
+    user = getattr(g, 'current_user', None)
     quizzes = list_quizzes_service(course_id)
-    return render_template("quiz_list.html", quizzes=quizzes, course_id=course_id)
+    return render_template("quiz_list.html", quizzes=quizzes, course_id=course_id, user=user)
 
 @quiz_bp.route("/create", methods=["GET", "POST"])
 @jwt_required
 def create_quiz(course_id):
-
+    _ensure_instructor_or_admin()
     if request.method == "GET":
         return render_template(
             "quiz/create_quiz.html",
@@ -85,18 +92,27 @@ def get_quiz(course_id, quiz_id):
         return jsonify({"error": str(exc)}), 404
 
 @quiz_bp.route("/<int:quiz_id>", methods=["DELETE"])
+@jwt_required
 def delete_quiz(course_id, quiz_id):
     try:
-        delete_quiz_service(quiz_id)
-        return jsonify({"message": "Quiz deleted"}), 200
-    except (PermissionError, ValueError) as exc:
-        return jsonify({"error": str(exc)}), 400
+        _ensure_instructor_or_admin()
 
-# ---------- Question ----------
+        delete_quiz_service(quiz_id)
+
+        return jsonify({
+            "message": "Quiz deleted successfully"
+        }), 200
+
+    except (PermissionError, ValueError) as exc:
+        return jsonify({
+            "error": str(exc)
+        }), 400
+
 @quiz_bp.route("/<int:quiz_id>/questions", methods=["POST"])
 @jwt_required
 def add_question(quiz_id, course_id):
     try:
+        _ensure_instructor_or_admin()
         if request.form:
             options = []
             correct = request.form.get('correct_option')
@@ -121,15 +137,54 @@ def list_questions(quiz_id, course_id):
     payload = [{"id": q.id, "prompt": q.prompt, "options": q.get_options()} for q in qs]
     return jsonify(payload), 200
 
-@quiz_bp.route("/questions/<int:question_id>", methods=["DELETE"])
+@quiz_bp.route("/questions/<int:question_id>", methods=["DELETE", "POST"])
+@jwt_required
 def delete_question(course_id, question_id):
+    _ensure_instructor_or_admin()
     try:
         delete_question_service(question_id)
+        if request.form or request.method == "POST":
+            quiz_id = request.form.get("quiz_id") or request.args.get("quiz_id")
+            flash("Question deleted.", "success")
+            if quiz_id:
+                return redirect(url_for('quiz.manage_quiz', course_id=course_id, quiz_id=quiz_id))
         return jsonify({"message": "Question deleted"}), 200
     except (PermissionError, ValueError) as exc:
         return jsonify({"error": str(exc)}), 400
 
-# ---------- Attempt ----------
+@quiz_bp.route("/<int:quiz_id>/edit", methods=["POST"])
+@jwt_required
+def edit_quiz(course_id, quiz_id):
+    _ensure_instructor_or_admin()
+    try:
+        title = request.form.get("title")
+        update_quiz_service(quiz_id, title)
+        flash("Quiz title updated successfully.", "success")
+        return redirect(url_for('quiz.manage_quiz', course_id=course_id, quiz_id=quiz_id))
+    except (PermissionError, ValueError) as exc:
+        flash(str(exc), "danger")
+        return redirect(url_for('quiz.manage_quiz', course_id=course_id, quiz_id=quiz_id))
+
+@quiz_bp.route("/<int:quiz_id>/questions/<int:question_id>/edit", methods=["POST"])
+@jwt_required
+def edit_question(course_id, quiz_id, question_id):
+    _ensure_instructor_or_admin()
+    try:
+        options = []
+        correct = request.form.get('correct_option')
+        for index in range(1, 5):
+            text = request.form.get(f'option_{index}')
+            if text:
+                options.append({'option': text, 'is_correct': str(index) == correct})
+        data = {'prompt': request.form.get('prompt'), 'options': options}
+        update_question_service(question_id, data)
+        flash("Question updated successfully.", "success")
+        return redirect(url_for('quiz.manage_quiz', course_id=course_id, quiz_id=quiz_id))
+    except (PermissionError, ValueError) as exc:
+        flash(str(exc), "danger")
+        return redirect(url_for('quiz.manage_quiz', course_id=course_id, quiz_id=quiz_id))
+
+
 @quiz_bp.route("/<int:quiz_id>/attempt", methods=["POST"])
 @jwt_required
 def attempt_quiz(quiz_id, course_id):
@@ -140,7 +195,7 @@ def attempt_quiz(quiz_id, course_id):
                 if key.startswith('q'):
                     answers[key[1:]] = value
         else:
-            answers = request.get_json()
+            answers = request.get_json() if request.is_json else request.form
         result = submit_attempt_service(quiz_id, answers)
         if request.form:
             flash(f'Quiz submitted. Score: {result.score:.1f}%', 'success')
@@ -149,24 +204,37 @@ def attempt_quiz(quiz_id, course_id):
     except (PermissionError, ValueError) as exc:
         return jsonify({"error": str(exc)}), 400
 
-# ---------- Results ----------
 @quiz_bp.route("/my/results", methods=["GET"])
 @quiz_bp.route("/my/results/view", methods=["GET"])
+@jwt_required
 def view_my_results(course_id):
-    results = get_student_results_service()
-    return render_template("quiz_results.html", results=results)
-
+    PAGE_SIZE = 10
+    page = int(request.args.get('page', 1))
+    search = request.args.get('search', '').strip()
+    
     try:
-        results = get_student_results_service()
-        payload = [
-            {
-                "quiz_id": r.quiz_id,
-                "score": r.score,
-                "submitted_at": r.submitted_at.isoformat(),
-            }
-            for r in results
-        ]
-        return jsonify(payload), 200
+        data = get_student_results_paginated_service(page=page, per_page=PAGE_SIZE, search=search)
+        
+        results_data = []
+        for r, q, crs in data['results']:
+            results_data.append({
+                "result_id": r.id,
+                "quiz_id": q.id,
+                "course_id": crs.id,
+                "quiz_title": q.title,
+                "course_title": crs.title,
+                "score": int(r.score),
+                "submitted_at": r.submitted_at.strftime('%Y-%m-%d %H:%M')
+            })
+
+        return render_template(
+            "quiz_results.html",
+            course_id=course_id,
+            results_data=results_data,
+            page=data['page'],
+            total_pages=data['total_pages'],
+            search=search
+        )
     except PermissionError as exc:
         return jsonify({"error": str(exc)}), 401
 
@@ -192,3 +260,28 @@ def quiz_results(quiz_id, course_id):
         return jsonify(payload), 200
     except PermissionError as exc:
         return jsonify({"error": str(exc)}), 403
+
+
+@quiz_bp.route("/<int:quiz_id>/results/<int:result_id>", methods=["GET"])
+@jwt_required
+def review_quiz_result(course_id, quiz_id, result_id):
+    try:
+        result = get_quiz_result_detail_service(result_id)
+        quiz = get_quiz_service(quiz_id)
+        questions = list_questions_service(quiz_id)
+        user = g.current_user
+        
+        answers = result.get_answers()  # dict of string(question_id) -> option_idx
+        
+        return render_template(
+            "quiz/quiz_attempt_detail.html",
+            course_id=course_id,
+            quiz=quiz,
+            questions=questions,
+            answers=answers,
+            result=result,
+            user=user
+        )
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 404
+

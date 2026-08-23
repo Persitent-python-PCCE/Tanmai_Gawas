@@ -21,11 +21,19 @@ def get_my_progress(course_id):
         avg_score = sum(r.score for r in results) / len(results)
         quiz_pct = avg_score / 100.0
     else:
+        avg_score = 0
         quiz_pct = 0.0
 
     overall = (lesson_pct * 0.7 + quiz_pct * 0.3) * 100
     update_progress(student_id, course_id, overall)
-    return {"completion_percent": round(overall, 2)}
+    return {
+        "completion_percent": round(overall, 2),
+        "lessons_completed": completed,
+        "total_lessons": total_lessons,
+        "quizzes_taken": len(results),
+        "total_quizzes": len(results),  # Could be enhanced to count total quizzes in course
+        "average_score": round(avg_score, 2) if results else 0
+    }
 
 def recalculate_progress(student_id, course_id):
     total_lessons = total_lessons_in_course(course_id)

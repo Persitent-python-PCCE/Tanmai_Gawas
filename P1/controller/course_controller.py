@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template, g, redirect, url_for, flash
+from service.enrollment_service import _ensure_instructor_or_admin, list_my_enrollments
 from utils.jwt_util import jwt_required
 from service.course_service import (
     create_course_service,
@@ -14,6 +15,7 @@ course_bp = Blueprint('course', __name__, url_prefix='/courses')
 @jwt_required
 def create_course():
     try:
+        _ensure_instructor_or_admin()
         data = request.form if request.form else request.get_json()
         course = create_course_service(data)
         if request.form:
@@ -30,16 +32,24 @@ def list_courses():
     page = int(request.args.get('page', 1))
     per_page = 10
 
+    jwt_user = getattr(g, 'current_user', None)
+
     courses, total = list_courses_service(
         search=query,
         page=page,
         per_page=per_page
     )
 
+    enrolled_courses_ids = set()
+
+    if jwt_user and jwt_user.get('role') == 'student':
+        enrolled_courses_ids = {e.course_id for e in list_my_enrollments()}
+
     if 'text/html' in request.headers.get('Accept', ''):
         return render_template(
             'course/course_list.html',
             courses=courses,
+            enrolled_courses_ids=enrolled_courses_ids,
             query=query,
             page=page,
             total=total
@@ -87,6 +97,7 @@ def get_course(course_id):
 @course_bp.route('/<int:course_id>', methods=['PUT'])
 def update_course(course_id):
     try:
+        _ensure_instructor_or_admin()
         c = update_course_service(course_id, request.get_json())
         return jsonify({'id': c.id, 'title': getattr(c, 'title', None)}), 200
     except (PermissionError, ValueError) as exc:
@@ -95,6 +106,7 @@ def update_course(course_id):
 @course_bp.route('/<int:course_id>', methods=['DELETE'])
 def delete_course(course_id):
     try:
+        _ensure_instructor_or_admin()
         delete_course_service(course_id)
         return jsonify({'message': 'Course deleted'}), 200
     except PermissionError as exc:

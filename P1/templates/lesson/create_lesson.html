@@ -11,6 +11,8 @@
     <textarea name="content" placeholder="Lesson content"></textarea>
     <input type="number" name="order" placeholder="Order" value="0">
     <button type="submit">Add Lesson</button>
+    <a class="button-link" href="{{ url_for('course.course_detail', course_id=module.course_id) }}">Back to Course</a>
+
 </form>
 </section>
 {% endblock %}

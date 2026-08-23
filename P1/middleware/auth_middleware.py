@@ -1,6 +1,7 @@
 from flask import g, request, abort
 from utils.jwt_util import decode_token
 
+PUBLIC_ENDPOINTS = ['auth.login_jwt','login_jwt','register','auth.register', 'logout', 'auth.logout','static']
 
 def jwt_middleware(app):
 
@@ -8,6 +9,8 @@ def jwt_middleware(app):
     def verify_jwt():
 
         # Always initialize for this request
+        if request.endpoint in PUBLIC_ENDPOINTS:
+            return None
         g.current_user = None
 
         token = None
