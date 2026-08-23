@@ -16,6 +16,8 @@ ALLOWED_EXTENSIONS = {"pdf", "png", "jpg", "jpeg", "mp4", "doc", "docx"}
 MAX_SIZE_MB = 50
 
 
+from utils.logger import log_instructor_action
+
 class MaterialService:
     """Encapsulates material upload/list/delete logic."""
 
@@ -31,19 +33,23 @@ class MaterialService:
         os.makedirs(upload_dir, exist_ok=True)
         file_path = os.path.join(upload_dir, secure_name)
         file_storage.save(file_path)
-        return create_material(
+        material = create_material(
             module_id=module_id,
             file_path=file_path,
             file_type=secure_name.rsplit(".", 1)[-1],
             uploaded_by=get_current_user_id(),
         )
+        log_instructor_action(f"Uploaded material (id={material.id}) for module (id={module_id}): Path={file_path}", "info")
+        return material
 
     def list_materials(self, module_id):
         return list_materials_by_module(module_id)
 
     def delete_material(self, material_id):
         _ensure_instructor()
-        return delete_material(material_id)
+        material = delete_material(material_id)
+        log_instructor_action(f"Deleted material (id={material_id})", "info")
+        return material
 
 
 # Module‑level singleton for easy imports

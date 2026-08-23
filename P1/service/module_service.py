@@ -11,13 +11,17 @@ from dao.module_dao import (
 from utils.role_check import _ensure_instructor
 
 
+from utils.logger import log_instructor_action
+
 class ModuleService:
     """Encapsulates module CRUD operations."""
 
     def create_module(self, course_id, data):
         _ensure_instructor()
         filtered = {k: v for k, v in data.items() if k in ("title", "order")}
-        return create_module(course_id=course_id, **filtered)
+        module = create_module(course_id=course_id, **filtered)
+        log_instructor_action(f"Created module (id={module.id}) for course (id={course_id}): {filtered}", "info")
+        return module
 
     def get_module(self, module_id):
         module = get_module(module_id)
@@ -30,11 +34,15 @@ class ModuleService:
 
     def update_module(self, module_id, data):
         _ensure_instructor()
-        return update_module(module_id, **data)
+        module = update_module(module_id, **data)
+        log_instructor_action(f"Updated module (id={module_id}): {data}", "info")
+        return module
 
     def delete_module(self, module_id):
         _ensure_instructor()
-        return delete_module(module_id)
+        module = delete_module(module_id)
+        log_instructor_action(f"Deleted module (id={module_id})", "info")
+        return module
 
 
 # Module‑level singleton

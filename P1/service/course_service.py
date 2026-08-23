@@ -14,6 +14,8 @@ from service.enrollment_service import _ensure_instructor_or_admin
 from utils.role_check import _ensure_admin, _ensure_instructor, get_current_user_id
 
 
+from utils.logger import log_instructor_action, log_admin_action
+
 class CourseService:
     """Encapsulates business logic for courses."""
 
@@ -24,7 +26,9 @@ class CourseService:
         description = data.get('description', '')
         if not title:
             raise ValueError("Course title required")
-        return create_course(title=title, description=description, instructor_id=instructor_id)
+        course = create_course(title=title, description=description, instructor_id=instructor_id)
+        log_instructor_action(f"Created course (id={course.id}): Title='{title}', Instructor={instructor_id}", "info")
+        return course
 
     def get_course_service(self, course_id):
         course = get_course(course_id)
@@ -37,14 +41,20 @@ class CourseService:
 
     def update_course_service(self, course_id, data):
         _ensure_instructor()
-        return update_course(course_id, **data)
+        course = update_course(course_id, **data)
+        log_instructor_action(f"Updated course (id={course_id}): {data}", "info")
+        return course
 
     def delete_course_service(self, course_id):
         _ensure_instructor_or_admin()
-        return delete_course(course_id)
+        course = delete_course(course_id)
+        log_instructor_action(f"Deleted course (id={course_id})", "info")
+        return course
 
     def admin_update_course_service(self, course_id, data):
-        return update_course(course_id, **data)
+        course = update_course(course_id, **data)
+        log_admin_action(f"Admin updated course (id={course_id}): {data}", "info")
+        return course
 
     def list_courses_by_instructor(self, instructor_id):
         _ensure_instructor_or_admin()

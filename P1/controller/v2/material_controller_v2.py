@@ -78,6 +78,8 @@ def delete_material(module_id, material_id):
         return jsonify({'error': str(exc)}), 404
 
 
+from utils.logger import log_student_action
+
 @material_v2_bp.route('/courses/<int:course_id>/modules/<int:module_id>/materials/<path:filename>', methods=['GET'])
 @jwt_required
 def download_material(course_id, module_id, filename):
@@ -98,5 +100,6 @@ def download_material(course_id, module_id, filename):
     if not os.path.isfile(safe_path):
         abort(404, description='File not found')
     
+    log_student_action(f"Student (id={user_id}) downloaded material: {filename} from course (id={course_id}) via v2", "info")
     # Use Flask's send_from_directory to stream the file
     return send_from_directory(upload_root, filename, as_attachment=True)

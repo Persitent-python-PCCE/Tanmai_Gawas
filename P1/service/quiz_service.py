@@ -30,6 +30,8 @@ from utils.role_check import _ensure_instructor, _ensure_student, get_current_us
 from service.enrollment_service import _ensure_instructor_or_admin
 
 
+from utils.logger import log_instructor_action, log_student_action
+
 class QuizService:
     """Encapsulates all quiz‑related business logic as instance methods."""
 
@@ -39,7 +41,9 @@ class QuizService:
         title = data.get("title")
         if not title:
             raise ValueError("Quiz title required")
-        return create_quiz(title, course_id, instructor_id=get_current_user_id())
+        quiz = create_quiz(title, course_id, instructor_id=get_current_user_id())
+        log_instructor_action(f"Created quiz (id={quiz.id}) for course (id={course_id}): Title='{title}'", "info")
+        return quiz
 
     def get_quiz_service(self, quiz_id):
         quiz = get_quiz(quiz_id)
@@ -52,7 +56,9 @@ class QuizService:
 
     def delete_quiz_service(self, quiz_id):
         _ensure_instructor()
-        return delete_quiz(quiz_id)
+        quiz = delete_quiz(quiz_id)
+        log_instructor_action(f"Deleted quiz (id={quiz_id})", "info")
+        return quiz
 
     # ---------- Question CRUD ----------
     def add_question_service(self, quiz_id, data):
@@ -61,14 +67,18 @@ class QuizService:
         options = data.get("options")  # expects list of {"option": ..., "is_correct": bool}
         if not prompt or not isinstance(options, list) or not options:
             raise ValueError("Prompt and non‑empty options list required")
-        return create_question(quiz_id, prompt, options)
+        question = create_question(quiz_id, prompt, options)
+        log_instructor_action(f"Added question (id={question.id}) to quiz (id={quiz_id})", "info")
+        return question
 
     def list_questions_service(self, quiz_id):
         return list_questions_by_quiz(quiz_id)
 
     def delete_question_service(self, question_id):
         _ensure_instructor()
-        return delete_question(question_id)
+        question = delete_question(question_id)
+        log_instructor_action(f"Deleted question (id={question_id})", "info")
+        return question
 
     # ---------- Student attempt ----------
     def submit_attempt_service(self, quiz_id, answers_dict):
@@ -86,7 +96,9 @@ class QuizService:
             if chosen is not None and int(chosen) == correct_idx:
                 correct += 1
         score = correct / total * 100
-        return submit_quiz_result(quiz_id, student_id=get_current_user_id(), answers_dict=answers_dict, score=score)
+        result = submit_quiz_result(quiz_id, student_id=get_current_user_id(), answers_dict=answers_dict, score=score)
+        log_student_action(f"Student (id={get_current_user_id()}) attempted quiz (id={quiz_id}) - Score: {score}%", "info")
+        return result
 
     def get_student_results_service(self):
         _ensure_student()
@@ -107,7 +119,9 @@ class QuizService:
         _ensure_instructor()
         if not title:
             raise ValueError("Quiz title required")
-        return update_quiz_title(quiz_id, title)
+        quiz = update_quiz_title(quiz_id, title)
+        log_instructor_action(f"Updated quiz title (id={quiz_id}) to '{title}'", "info")
+        return quiz
 
     def update_question_service(self, question_id, data):
         _ensure_instructor()
@@ -115,7 +129,9 @@ class QuizService:
         options = data.get("options")
         if not prompt or not isinstance(options, list) or not options:
             raise ValueError("Prompt and non‑empty options list required")
-        return update_question(question_id, prompt, options)
+        question = update_question(question_id, prompt, options)
+        log_instructor_action(f"Updated question (id={question_id}): Prompt='{prompt}'", "info")
+        return question
 
     def get_quiz_result_detail_service(self, result_id):
         result = get_quiz_result(result_id)

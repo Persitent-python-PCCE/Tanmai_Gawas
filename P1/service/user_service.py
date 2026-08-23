@@ -43,7 +43,10 @@ def get_user_by_id_service(user_id):
     return get_user_by_id(user_id)
 
 
+from utils.logger import log_admin_action
+
 def update_user_service(user_id, email, role):
+    log_admin_action(f"Updating user (id={user_id}) - Email: {email}, Role: {role}", "info")
     return update_user(
         user_id,
         email,
@@ -52,6 +55,7 @@ def update_user_service(user_id, email, role):
 
 
 def delete_user_service(user_id):
+    log_admin_action(f"Deleting user (id={user_id})", "info")
     return delete_user_by_id(user_id)
 
 def get_all_instructors_service():

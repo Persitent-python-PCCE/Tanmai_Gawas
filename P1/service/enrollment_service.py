@@ -30,6 +30,8 @@ def _ensure_instructor_or_admin_for_course():
         _ensure_admin()
 
 
+from utils.logger import log_student_action
+
 class EnrollmentService:
     """Encapsulates enrollment operations."""
 
@@ -42,11 +44,15 @@ class EnrollmentService:
         course = get_course(course_id)
         if not course:
             raise ValueError("Course not found")
-        return create_enrollment(user_id=get_current_user_id(), course_id=course_id)
+        enrollment = create_enrollment(user_id=get_current_user_id(), course_id=course_id)
+        log_student_action(f"Student (id={get_current_user_id()}) enrolled in course (id={course_id})", "info")
+        return enrollment
 
     def unenroll_student(self, course_id):
         _ensure_student()
-        return delete_enrollment(user_id=get_current_user_id(), course_id=course_id)
+        result = delete_enrollment(user_id=get_current_user_id(), course_id=course_id)
+        log_student_action(f"Student (id={get_current_user_id()}) unenrolled from course (id={course_id})", "info")
+        return result
 
     def list_my_enrollments(self):
         student_id = get_current_user_id()
