@@ -4,20 +4,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class BaseConfig:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key')
+    SECRET_KEY = os.getenv('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key')
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     JWT_ALGORITHM = 'HS256'
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URI', 'mysql+pymysql://root:1234@localhost/lms_db')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DEV_DATABASE_URI')
 
 class TestingConfig(BaseConfig):
     TESTING = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URI', 'sqlite:///test.db')
-    JWT_ACCESS_TOKEN_EXPIRES = False  
+    SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URI')
+    JWT_ACCESS_TOKEN_EXPIRES = False
 
 class ProductionConfig(BaseConfig):
     DEBUG = False

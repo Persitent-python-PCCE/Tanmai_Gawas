@@ -4,7 +4,7 @@ v2 Authentication API - JSON only endpoints.
 """
 
 from flask import Blueprint, request, jsonify, make_response
-from service.auth_service import register_user, authenticate_user
+from service.auth_service import register_user, authenticate_user, verify_otp, resend_otp
 from flask_login import login_user, logout_user as flask_logout, login_required, current_user
 from utils.jwt_util import create_access_token, decode_token, jwt_required
 
@@ -21,12 +21,53 @@ def register():
         user, msg = register_user(data)
         return jsonify({
             'message': msg,
+            'email': user.email
+        }), 201
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+
+
+@auth_v2_bp.route('/verify-otp', methods=['POST'])
+def verify_otp_endpoint():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'JSON body required'}), 400
+    
+    email = data.get('email')
+    otp = data.get('otp')
+    
+    if not email or not otp:
+        return jsonify({'error': 'Email and OTP required'}), 400
+    
+    try:
+        user, msg = verify_otp(email, otp)
+        return jsonify({
+            'message': msg,
             'user': {
                 'id': user.id,
                 'email': user.email,
                 'role': user.role
             }
-        }), 201
+        }), 200
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+
+
+@auth_v2_bp.route('/resend-otp', methods=['POST'])
+def resend_otp_endpoint():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'JSON body required'}), 400
+    
+    email = data.get('email')
+    if not email:
+        return jsonify({'error': 'Email required'}), 400
+    
+    try:
+        user, msg = resend_otp(email)
+        return jsonify({
+            'message': msg
+        }), 200
     except ValueError as exc:
         return jsonify({'error': str(exc)}), 400
 
