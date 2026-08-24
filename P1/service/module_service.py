@@ -1,6 +1,3 @@
-# service/module_service.py
-"""Business logic for module management (Phase 2)."""
-
 from dao.module_dao import (
     create_module,
     get_module,
@@ -45,10 +42,8 @@ class ModuleService:
         return module
 
 
-# Module‑level singleton
 module_service = ModuleService()
 
-# Backward‑compatible wrappers
 def create_module_service(*args, **kwargs):
     return module_service.create_module(*args, **kwargs)
 

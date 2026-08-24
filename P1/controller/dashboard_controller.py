@@ -23,7 +23,7 @@ class SimpleCache:
 student_cache = SimpleCache()
 dashboard_bp = Blueprint('dashboard', __name__)
 
-@dashboard_bp.route('/')
+@dashboard_bp.route('/dashboard')
 @jwt_required
 def home():
     user = g.current_user

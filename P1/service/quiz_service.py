@@ -1,10 +1,3 @@
-# service/quiz_service.py
-"""Service layer for quiz CRUD, question management, and quiz attempts.
-* Instructors can create/update/delete quizzes and questions.
-* Students can retrieve a quiz (questions only) and submit their answers.
-* Scoring is simple: count correct options vs total.
-"""
-
 from dao.quiz_dao import (
     average_score_by_instructor,
     count_quizzes_by_instructor,
@@ -35,7 +28,6 @@ from utils.logger import log_instructor_action, log_student_action
 class QuizService:
     """Encapsulates all quiz‑related business logic as instance methods."""
 
-    # ---------- Quiz CRUD ----------
     def create_quiz_service(self, course_id, data):
         _ensure_instructor()
         title = data.get("title")
@@ -60,11 +52,10 @@ class QuizService:
         log_instructor_action(f"Deleted quiz (id={quiz_id})", "info")
         return quiz
 
-    # ---------- Question CRUD ----------
     def add_question_service(self, quiz_id, data):
         _ensure_instructor()
         prompt = data.get("prompt")
-        options = data.get("options")  # expects list of {"option": ..., "is_correct": bool}
+        options = data.get("options")
         if not prompt or not isinstance(options, list) or not options:
             raise ValueError("Prompt and non‑empty options list required")
         question = create_question(quiz_id, prompt, options)
@@ -80,10 +71,8 @@ class QuizService:
         log_instructor_action(f"Deleted question (id={question_id})", "info")
         return question
 
-    # ---------- Student attempt ----------
     def submit_attempt_service(self, quiz_id, answers_dict):
         _ensure_student()
-        # answers_dict: {question_id: chosen_index}
         questions = list_questions_by_quiz(quiz_id)
         if not questions:
             raise ValueError("Quiz has no questions")
@@ -153,10 +142,8 @@ class QuizService:
         return get_instructor_students(instructor_id)
 
 
-# Module‑level singleton for easy import elsewhere
 quiz_service = QuizService()
 
-# -------- Backward‑compatible function wrappers --------
 def create_quiz_service(*args, **kwargs):
     return quiz_service.create_quiz_service(*args, **kwargs)
 

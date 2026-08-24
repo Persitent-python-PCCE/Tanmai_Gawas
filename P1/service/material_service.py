@@ -1,5 +1,3 @@
-# service/material_service.py
-"""Business logic for material handling (Phase 4)."""
 
 from dao.material_dao import (
     create_material,
@@ -52,10 +50,8 @@ class MaterialService:
         return material
 
 
-# Module‑level singleton for easy imports
 material_service = MaterialService()
 
-# Backward‑compatible function wrappers
 def upload_material_service(*args, **kwargs):
     return material_service.upload_material(*args, **kwargs)
 

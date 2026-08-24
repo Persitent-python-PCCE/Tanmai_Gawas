@@ -8,7 +8,6 @@ class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key')
     JWT_ALGORITHM = 'HS256'
-    # Add other common settings here
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
@@ -18,9 +17,8 @@ class TestingConfig(BaseConfig):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv('TEST_DATABASE_URI', 'sqlite:///test.db')
-    JWT_ACCESS_TOKEN_EXPIRES = False  # disable expiration for tests
+    JWT_ACCESS_TOKEN_EXPIRES = False  
 
 class ProductionConfig(BaseConfig):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI')
-    # In production, ensure SECRET_KEY and JWT_SECRET_KEY are set via env

@@ -1,6 +1,3 @@
-# service/lesson_service.py
-"""Business logic for lesson management (Phase 2)."""
-
 from dao.lesson_dao import (
     create_lesson,
     get_lesson,
@@ -52,10 +49,8 @@ class LessonService:
         return completion
 
 
-# Module‑level singleton
 lesson_service = LessonService()
 
-# Backward‑compatible wrappers
 def create_lesson_service(*args, **kwargs):
     return lesson_service.create_lesson(*args, **kwargs)
 

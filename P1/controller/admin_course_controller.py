@@ -28,7 +28,6 @@ def list_admin_courses():
 
     total_pages = max(1, (total + per_page - 1) // per_page)
 
-    # Guard against a page number beyond the last available page
     if page > total_pages:
         page = total_pages
 

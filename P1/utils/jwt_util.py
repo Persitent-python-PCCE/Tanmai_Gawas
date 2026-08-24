@@ -59,14 +59,12 @@ def jwt_required(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
 
-        # First try Authorization header
         auth_header = request.headers.get("Authorization", "")
 
         if auth_header.startswith("Bearer "):
             token = auth_header.split(" ", 1)[1].strip()
 
         else:
-            # Browser requests will send the JWT through this cookie
             token = request.cookies.get("access_token")
 
         if not token:
@@ -74,7 +72,6 @@ def jwt_required(fn):
 
         payload = decode_token(token)
 
-        # Store decoded JWT for the current request
         g.current_user = payload
 
         return fn(*args, **kwargs)

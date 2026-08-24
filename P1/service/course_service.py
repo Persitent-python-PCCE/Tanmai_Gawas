@@ -1,4 +1,3 @@
-# service/course_service.py
 """Service layer for course management.
 All functions are now methods of CourseService; wrappers preserve backward compatibility.
 """
@@ -62,10 +61,8 @@ class CourseService:
         return [c for c in courses if c.instructor_id == instructor_id]
 
 
-# Module‑level singleton
 course_service = CourseService()
 
-# Backward‑compatible wrappers
 def create_course_service(*args, **kwargs):
     return course_service.create_course_service(*args, **kwargs)
 

@@ -1,14 +1,12 @@
-# service/auth_service.py
-"""Authentication related business logic encapsulated in a service class."""
-
 from werkzeug.security import generate_password_hash, check_password_hash
 from dao.user_dao import create_user, get_user_by_email
 from utils.logger import log_general_action
 from flask_login import logout_user as flask_logout_user
+from utils.jwt_util import create_access_token
+
 
 
 class AuthService:
-    """Provides methods for user registration, authentication, token generation, and logout."""
 
     def register_user(self, data):
         email = data.get('email')
@@ -43,10 +41,6 @@ class AuthService:
         return None
 
     def generate_token(self, user_dict):
-        """Create a JWT for the supplied user dictionary.
-        ``user_dict`` must contain ``id`` and ``role`` keys.
-        """
-        from utils.jwt_util import create_access_token
         user_id = user_dict.get('id')
         role = user_dict.get('role')
         if user_id is None or role is None:
@@ -54,18 +48,12 @@ class AuthService:
         return create_access_token(user_id, role, user_dict.get('email', ''))
 
     def logout_user(self):
-        """Log out the current user using Flask-Login's ``logout_user``.
-        This is a thin wrapper so the controller can import ``logout_user``
-        from the service layer just like the other auth functions.
-        """
         flask_logout_user()
         return True
 
 
-# Module‑level singleton for easy import
 auth_service = AuthService()
 
-# Backward‑compatible functional wrappers
 def register_user(*args, **kwargs):
     return auth_service.register_user(*args, **kwargs)
 

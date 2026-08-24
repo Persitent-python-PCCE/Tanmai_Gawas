@@ -1,6 +1,3 @@
-# service/progress_service.py
-"""Business logic for progress tracking (Phase 6)."""
-
 from dao.progress_dao import get_progress, update_progress
 from dao.lesson_completion_dao import count_completed_lessons, total_lessons_in_course
 from dao.quiz_dao import get_quiz_results_by_student_and_course
@@ -10,12 +7,10 @@ def get_my_progress(course_id):
     _ensure_student()
     student_id = get_current_user_id()
 
-    # Lesson contribution
     total_lessons = total_lessons_in_course(course_id)
     completed = count_completed_lessons(student_id, course_id)
     lesson_pct = (completed / total_lessons) if total_lessons else 0.0
 
-    # Quiz contribution
     results = get_quiz_results_by_student_and_course(student_id, course_id)
     if results:
         avg_score = sum(r.score for r in results) / len(results)
@@ -31,7 +26,7 @@ def get_my_progress(course_id):
         "lessons_completed": completed,
         "total_lessons": total_lessons,
         "quizzes_taken": len(results),
-        "total_quizzes": len(results),  # Could be enhanced to count total quizzes in course
+        "total_quizzes": len(results),
         "average_score": round(avg_score, 2) if results else 0
     }
 

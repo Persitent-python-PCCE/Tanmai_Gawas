@@ -1,4 +1,3 @@
-# service/dashboard_service.py
 """Business logic for instructor dashboard (Phase 3) and admin dashboard."""
 
 from service.enrollment_service import count_students_by_instructor_service
@@ -39,10 +38,8 @@ class DashboardService:
         return get_admin_dashboard_stats()
 
 
-# Module‑level singleton
 dashboard_service = DashboardService()
 
-# Backward‑compatible wrapper
 def get_instructor_dashboard_service(*args, **kwargs):
     return dashboard_service.get_instructor_dashboard(*args, **kwargs)
 

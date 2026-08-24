@@ -1,5 +1,3 @@
-# service/enrollment_service.py
-"""Business logic for enrollment actions (Phase 3)."""
 
 from dao.enrollment_dao import (
     create_enrollment,
@@ -69,10 +67,8 @@ class EnrollmentService:
         return count_students_by_instructor(instructor_id)
 
 
-# Module‑level singleton
 enrollment_service = EnrollmentService()
 
-# Backward‑compatible wrappers
 def is_user_enrolled_service(*args, **kwargs):
     return enrollment_service.is_user_enrolled(*args, **kwargs)
 
