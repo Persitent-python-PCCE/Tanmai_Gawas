@@ -10,12 +10,12 @@ class Enrollment(db.Model):
     __tablename__ = "enrollments"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey("courses.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey("courses.id", ondelete="CASCADE"), nullable=False)
     enrolled_at = db.Column(db.DateTime, server_default=db.func.now())
 
     # Relationships (optional, but handy for eager loading)
-    user = db.relationship("User", backref="enrollments", lazy="joined")
+    user = db.relationship("User", back_populates="enrollments", lazy="joined")
     course = db.relationship("Course", back_populates="enrollments", lazy="joined")
 
     __table_args__ = (

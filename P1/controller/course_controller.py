@@ -46,13 +46,16 @@ def list_courses():
         enrolled_courses_ids = {e.course_id for e in list_my_enrollments()}
 
     if 'text/html' in request.headers.get('Accept', ''):
+        total_pages = max(1, (total + per_page - 1) // per_page)
         return render_template(
             'course/course_list.html',
             courses=courses,
             enrolled_courses_ids=enrolled_courses_ids,
             query=query,
             page=page,
-            total=total
+            per_page=per_page,
+            total=total,
+            total_pages=total_pages
         )
 
     payload = [

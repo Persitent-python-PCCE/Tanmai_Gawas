@@ -35,12 +35,28 @@ def courses():
     _ensure_instructor()
     user = g.current_user
     instructor_id = int(user['sub'])
-    courses, _ = list_courses_service()
-    taught_courses = [c for c in courses if c.instructor_id == instructor_id]
+
+    PAGE_SIZE = 10
+    page = max(1, int(request.args.get('page', 1)))
+    search = request.args.get('search', '').strip()
+
+    all_courses, total_all = list_courses_service(search=search or None)
+    taught_courses = [c for c in all_courses if c.instructor_id == instructor_id]
+
+    total = len(taught_courses)
+    total_pages = max(1, (total + PAGE_SIZE - 1) // PAGE_SIZE)
+    page = min(page, total_pages)
+    start = (page - 1) * PAGE_SIZE
+    paginated_courses = taught_courses[start:start + PAGE_SIZE]
+
     return render_template(
         'dashboard/instructor_courses.html',
-        taught_courses=taught_courses,
-        user=user
+        taught_courses=paginated_courses,
+        user=user,
+        page=page,
+        total_pages=total_pages,
+        total=total,
+        search=search
     )
 
 @instructor_ui_bp.route('/instructor/create-course', methods=['GET'])

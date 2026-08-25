@@ -30,6 +30,19 @@ class EnrollmentDAO:
     def get_enrollments_by_user(self, user_id):
         return Enrollment.query.filter_by(user_id=user_id).all()
 
+    def get_enrollments_by_user_paginated(self, user_id, page=1, per_page=10, search=None):
+        query = (
+            Enrollment.query
+            .join(Course, Enrollment.course_id == Course.id)
+            .filter(Enrollment.user_id == user_id)
+        )
+        if search:
+            query = query.filter(Course.title.ilike(f'%{search}%'))
+        query = query.order_by(Enrollment.enrolled_at.desc())
+        total = query.count()
+        items = query.offset((page - 1) * per_page).limit(per_page).all()
+        return items, total
+
     def count_students_by_instructor(self, instructor_id):
         return (
             db.session.query(Enrollment.user_id)
@@ -66,6 +79,9 @@ def get_enrollment(*args, **kwargs):
 
 def get_enrollments_by_user(*args, **kwargs):
     return enrollment_dao.get_enrollments_by_user(*args, **kwargs)
+
+def get_enrollments_by_user_paginated(*args, **kwargs):
+    return enrollment_dao.get_enrollments_by_user_paginated(*args, **kwargs)
 
 def count_students_by_instructor(*args, **kwargs):
     return enrollment_dao.count_students_by_instructor(*args, **kwargs)

@@ -17,6 +17,15 @@ class User(UserMixin, db.Model):
     otp_expires_at = db.Column(db.DateTime, nullable=True)
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
 
+    # Cascading relationships
+    courses = db.relationship('Course', backref='instructor', lazy='select', cascade='all, delete-orphan')
+    enrollments = db.relationship('Enrollment', back_populates='user', lazy='select', cascade='all, delete-orphan')
+    progress_records = db.relationship('Progress', backref='student', lazy='select', cascade='all, delete-orphan')
+    completions = db.relationship('LessonCompletion', backref='student', lazy='select', cascade='all, delete-orphan')
+    quiz_results = db.relationship('QuizResult', backref='student', lazy='select', cascade='all, delete-orphan')
+    materials = db.relationship('Material', backref='uploader', lazy='select', cascade='all, delete-orphan')
+    quizzes = db.relationship('Quiz', backref='instructor', lazy='select', cascade='all, delete-orphan')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'is_verified' not in kwargs:

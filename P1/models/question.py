@@ -10,7 +10,7 @@ class Question(db.Model):
     __tablename__ = "questions"
 
     id = db.Column(db.Integer, primary_key=True)
-    quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"), nullable=False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id", ondelete="CASCADE"), nullable=False)
     prompt = db.Column(db.Text, nullable=False)
     # Stored as JSON string: [{"option": "A", "is_correct": true}, ...]
     options_json = db.Column(db.Text, nullable=False)

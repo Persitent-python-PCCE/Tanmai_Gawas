@@ -3,6 +3,7 @@ from dao.enrollment_dao import (
     create_enrollment,
     is_user_enrolled,
     get_enrollments_by_user,
+    get_enrollments_by_user_paginated,
     get_enrollments_by_course,
     count_students_by_instructor,
     delete_enrollment,
@@ -40,6 +41,14 @@ class EnrollmentService:
             raise PermissionError("Authentication required")
         return get_enrollments_by_user(student_id)
 
+    def list_my_enrollments_paginated(self, page=1, per_page=10, search=None):
+        student_id = get_current_user_id()
+        if not student_id:
+            raise PermissionError("Authentication required")
+        items, total = get_enrollments_by_user_paginated(student_id, page, per_page, search)
+        total_pages = max(1, (total + per_page - 1) // per_page)
+        return {'results': items, 'total': total, 'page': page, 'total_pages': total_pages}
+
     def list_course_enrollments(self, course_id):
         _ensure_instructor_or_admin()
         return get_enrollments_by_course(course_id)
@@ -62,6 +71,9 @@ def unenroll_student(*args, **kwargs):
 
 def list_my_enrollments(*args, **kwargs):
     return enrollment_service.list_my_enrollments(*args, **kwargs)
+
+def list_my_enrollments_paginated(*args, **kwargs):
+    return enrollment_service.list_my_enrollments_paginated(*args, **kwargs)
 
 def list_course_enrollments(*args, **kwargs):
     return enrollment_service.list_course_enrollments(*args, **kwargs)

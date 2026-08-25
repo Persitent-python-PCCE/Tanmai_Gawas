@@ -10,8 +10,8 @@ class QuizResult(db.Model):
     __tablename__ = "quiz_results"
 
     id = db.Column(db.Integer, primary_key=True)
-    quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id"), nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey("quizzes.id", ondelete="CASCADE"), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     score = db.Column(db.Float, nullable=False)
     submitted_at = db.Column(db.DateTime, server_default=db.func.now())
     answers_json = db.Column(db.Text, nullable=False)  # JSON dict {question_id: chosen_index}
