@@ -1,5 +1,10 @@
 from flask import g, render_template
 
+def _ensure_instructor_or_admin():
+    try:
+        _ensure_instructor()
+    except PermissionError:
+        _ensure_admin()
 
 def _ensure_admin():
     jwt_user = getattr(g, 'current_user', None)
@@ -41,12 +46,6 @@ def _ensure_instructor():
                 'Only instructors can perform this action (JWT)'
             )
         return
-
-
-    # if jwt_user["role"] != 'instructor':
-    #     raise PermissionError(
-    #         'Only instructors can perform this action'
-    #     )
 
 
 def get_current_user_id():

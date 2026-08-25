@@ -14,7 +14,7 @@ Routes (all under ``/courses/<course_id>/quizzes``):
 """
 
 from flask import Blueprint, g, request, jsonify, redirect, url_for, flash, render_template
-from service.enrollment_service import _ensure_instructor_or_admin
+from utils.role_check import _ensure_instructor_or_admin
 from utils.jwt_util import jwt_required
 from service.quiz_service import (
     create_quiz_service,
@@ -33,6 +33,8 @@ from service.quiz_service import (
     get_student_results_paginated_service,
 )
 from utils.role_check import get_current_user_id
+from flask import render_template
+
 
 quiz_bp = Blueprint("quiz", __name__, url_prefix="/courses/<int:course_id>/quizzes")
 
@@ -46,7 +48,6 @@ def take_quiz(course_id, quiz_id):
         return jsonify({"error": str(exc)}), 404
 
 
-from flask import render_template
 
 @quiz_bp.route("/view", methods=["GET"])
 def view_quizzes(course_id):

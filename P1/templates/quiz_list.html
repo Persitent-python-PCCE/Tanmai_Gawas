@@ -44,9 +44,13 @@
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="stat-icon primary p-2 rounded" style="font-size: var(--text-lg);"><i class="bi bi-patch-question"></i></div>
                                     <div>
+                                        {% if user and user.role == 'student' %}
                                         <a href="{{ url_for('quiz.take_quiz', course_id=course_id, quiz_id=quiz.id) }}" class="text-decoration-none fw-semibold text-primary hover-underline">
                                             {{ quiz.title }}
                                         </a>
+                                        {% else %}
+                                        {{ quiz.title }}
+                                        {%endif%}
                                     </div>
                                 </div>
                             </td>
@@ -62,7 +66,8 @@
                                     <a href="{{ url_for('quiz.manage_quiz', course_id=course_id, quiz_id=quiz.id) }}" class="btn btn-sm btn-outline-secondary">
                                         <i class="bi bi-pencil me-1"></i>Edit
                                     </a>
-                                    <a href="{{ url_for('quiz.review_quiz_result', course_id=course_id, quiz_id=quiz.id, result_id=quiz.id) }}"
+
+                                    <a href="{{ url_for('instructor_ui.quiz_results', course_id=course_id, quiz_id=quiz.id, result_id=quiz.id) }}"
                                         class="btn btn-sm btn-outline-secondary">
                                         <i class="bi bi-list-check me-1"></i>View Results
                                     </a>

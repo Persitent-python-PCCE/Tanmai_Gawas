@@ -19,8 +19,7 @@ from dao.quiz_dao import (
     get_instructor_quiz_results_paginated,
     get_instructor_students,
 )
-from utils.role_check import _ensure_instructor, _ensure_student, get_current_user_id
-from service.enrollment_service import _ensure_instructor_or_admin
+from utils.role_check import _ensure_instructor, _ensure_student, get_current_user_id, _ensure_instructor_or_admin
 
 
 from utils.logger import log_instructor_action, log_student_action

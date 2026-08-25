@@ -12,7 +12,8 @@ from service.course_service import (
     update_course_service,
     delete_course_service,
 )
-from service.enrollment_service import _ensure_instructor_or_admin, list_my_enrollments
+from service.enrollment_service import list_my_enrollments
+from utils.role_check import _ensure_instructor_or_admin
 
 course_v2_bp = Blueprint('course_v2', __name__, url_prefix='/api/v2/courses')
 

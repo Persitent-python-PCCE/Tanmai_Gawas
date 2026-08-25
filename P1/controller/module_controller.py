@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from service.course_service import get_course_service
-from service.enrollment_service import _ensure_instructor_or_admin
+from utils.role_check import _ensure_instructor_or_admin
 from utils.jwt_util import jwt_required
 from service.module_service import (
     create_module_service,

@@ -6,7 +6,7 @@ v2 Module API - JSON only endpoints.
 from flask import Blueprint, request, jsonify
 from utils.jwt_util import jwt_required
 from service.course_service import get_course_service
-from service.enrollment_service import _ensure_instructor_or_admin
+from utils.role_check import _ensure_instructor_or_admin
 from service.module_service import (
     create_module_service,
     get_module_service,

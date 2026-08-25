@@ -5,9 +5,8 @@ v2 Lesson API - JSON only endpoints.
 
 from flask import Blueprint, request, jsonify
 from utils.jwt_util import jwt_required
-from service.enrollment_service import _ensure_instructor_or_admin
 from service.module_service import get_module_service
-from utils.role_check import _ensure_student, get_current_user_id
+from utils.role_check import _ensure_student, get_current_user_id, _ensure_instructor_or_admin
 from dao.lesson_completion_dao import mark_completed
 from service.lesson_service import (
     create_lesson_service,

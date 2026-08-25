@@ -7,25 +7,7 @@ from dao.enrollment_dao import (
     count_students_by_instructor,
     delete_enrollment,
 )
-from utils.role_check import _ensure_student, _ensure_instructor, _ensure_admin, get_current_user_id
-
-
-def _ensure_instructor_or_admin():
-    """Utility to ensure the current user is either an instructor or admin.
-    Works for both JWT and Flask-Login contexts.
-    """
-    try:
-        _ensure_instructor()
-    except PermissionError:
-        _ensure_admin()
-
-
-def _ensure_instructor_or_admin_for_course():
-    """Utility to ensure the current user is instructor or admin for course operations."""
-    try:
-        _ensure_instructor()
-    except PermissionError:
-        _ensure_admin()
+from utils.role_check import _ensure_student, _ensure_instructor, _ensure_admin, get_current_user_id, _ensure_instructor_or_admin
 
 
 from utils.logger import log_student_action
@@ -59,7 +41,7 @@ class EnrollmentService:
         return get_enrollments_by_user(student_id)
 
     def list_course_enrollments(self, course_id):
-        _ensure_instructor_or_admin_for_course()
+        _ensure_instructor_or_admin()
         return get_enrollments_by_course(course_id)
 
     def count_students_by_instructor(self, instructor_id):

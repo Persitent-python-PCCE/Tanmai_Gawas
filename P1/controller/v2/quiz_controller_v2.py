@@ -5,8 +5,7 @@ v2 Quiz API - JSON only endpoints.
 
 from flask import Blueprint, request, jsonify, g
 from utils.jwt_util import jwt_required
-from service.enrollment_service import _ensure_instructor_or_admin
-from utils.role_check import get_current_user_id
+from utils.role_check import get_current_user_id, _ensure_instructor_or_admin
 from service.quiz_service import (
     create_quiz_service,
     list_quizzes_service,

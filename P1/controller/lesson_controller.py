@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash
-from service.enrollment_service import _ensure_instructor_or_admin
+from utils.role_check import _ensure_student, get_current_user_id, _ensure_instructor_or_admin
 from service.module_service import get_module_service
 from utils.jwt_util import jwt_required
-from utils.role_check import _ensure_student, get_current_user_id
 from service.lesson_service import (
     create_lesson_service,
     get_lesson_service,

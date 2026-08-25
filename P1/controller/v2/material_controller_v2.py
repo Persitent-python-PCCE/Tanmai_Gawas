@@ -11,8 +11,8 @@ from service.material_service import (
     list_materials_service,
     delete_material_service,
 )
-from service.enrollment_service import _ensure_instructor_or_admin, is_user_enrolled
-from utils.role_check import get_current_user_id
+from service.enrollment_service import is_user_enrolled
+from utils.role_check import get_current_user_id, _ensure_instructor_or_admin
 from werkzeug.utils import secure_filename
 import os
 
