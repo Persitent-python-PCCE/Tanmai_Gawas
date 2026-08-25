@@ -1,5 +1,8 @@
-Implement OTP compulsorily
-Error pages
-Linux environment implementation
-
 CASCADING
+db seeding
+
+ui :
+- add module
+- add lesson
+- mark complete
+- progress

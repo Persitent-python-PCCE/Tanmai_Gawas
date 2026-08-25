@@ -2,6 +2,7 @@ from dao.quiz_dao import (
     average_score_by_instructor,
     count_quizzes_by_instructor,
     create_quiz,
+    get_instructor_students_paginated,
     get_quiz,
     list_quizzes_by_course,
     delete_quiz,
@@ -140,6 +141,10 @@ class QuizService:
         _ensure_instructor_or_admin()
         return get_instructor_students(instructor_id)
 
+    def get_instructor_students_paginated_service(self, instructor_id: int, page: int = 1, per_page: int = 10, search: str = None):
+        _ensure_instructor_or_admin()
+        return get_instructor_students_paginated(instructor_id, page, per_page, search)
+
 
 quiz_service = QuizService()
 
@@ -193,3 +198,6 @@ def get_instructor_quiz_results_paginated_service(*args, **kwargs):
 
 def get_instructor_students_service(*args, **kwargs):
     return quiz_service.get_instructor_students_service(*args, **kwargs)
+
+def get_instructor_students_paginated_service(*args, **kwargs):
+    return quiz_service.get_instructor_students_paginated_service(*args, **kwargs)

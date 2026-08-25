@@ -196,6 +196,40 @@ class QuizDAO:
             .all()
         )
 
+    def get_instructor_students_paginated(self, instructor_id: int, page: int = 1, per_page: int = 10, search: str = None):
+        """Return paginated students enrolled in instructor's courses with search."""
+        from models.enrollment import Enrollment
+        from models.user import User
+        from models.course import Course
+        
+        query = (
+            db.session.query(Enrollment, User, Course)
+            .join(User, Enrollment.user_id == User.id)
+            .join(Course, Enrollment.course_id == Course.id)
+            .filter(Course.instructor_id == instructor_id)
+        )
+        
+        if search:
+            query = query.filter(User.email.ilike(f"%{search}%"))
+        
+        total_count = query.count()
+        total_pages = max(1, (total_count + per_page - 1) // per_page)
+        
+        results = (
+            query.order_by(Enrollment.enrolled_at.desc())
+            .limit(per_page)
+            .offset((page - 1) * per_page)
+            .all()
+        )
+        
+        return {
+            'results': results,
+            'total_count': total_count,
+            'total_pages': total_pages,
+            'page': page,
+            'per_page': per_page
+        }
+
 
 # Module‑level singleton for easy import
 quiz_dao = QuizDAO()
@@ -260,3 +294,6 @@ def get_instructor_quiz_results_paginated(*args, **kwargs):
 
 def get_instructor_students(*args, **kwargs):
     return quiz_dao.get_instructor_students(*args, **kwargs)
+
+def get_instructor_students_paginated(*args, **kwargs):
+    return quiz_dao.get_instructor_students_paginated(*args, **kwargs)

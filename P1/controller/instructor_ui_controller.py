@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, g, redirect, url_for, request
 from service.course_service import list_courses_service
 from service.dashboard_service import get_instructor_dashboard_service
-from service.quiz_service import get_instructor_students_service, get_instructor_quiz_results_paginated_service
+from service.quiz_service import get_instructor_students_service, get_instructor_quiz_results_paginated_service, get_instructor_students_paginated_service
 from service.user_service import get_user_by_id_service
 from utils.jwt_util import jwt_required
 from utils.role_check import _ensure_instructor
@@ -56,10 +56,15 @@ def students():
     user = g.current_user
     instructor_id = int(user['sub'])
     
-    enrollments = get_instructor_students_service(instructor_id)
+    # Pagination and search parameters
+    PAGE_SIZE = 10
+    page = int(request.args.get('page', 1))
+    search = request.args.get('search', '').strip()
+
+    data = get_instructor_students_paginated_service(instructor_id, page, PAGE_SIZE, search)
     
     students_data = []
-    for enroll, stu, crs in enrollments:
+    for enroll, stu, crs in data['results']:
         students_data.append({
             "email": stu.email,
             "course_title": crs.title,
@@ -69,7 +74,10 @@ def students():
     return render_template(
         'dashboard/instructor_students.html',
         students_data=students_data,
-        user=user
+        user=user,
+        page=data['page'],
+        total_pages=data['total_pages'],
+        search=search
     )
 
 @instructor_ui_bp.route('/instructor/quiz-results', methods=['GET'])

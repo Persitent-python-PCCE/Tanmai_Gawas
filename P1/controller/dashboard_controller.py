@@ -3,6 +3,9 @@ from flask import Blueprint, render_template, redirect, url_for, g
 from flask_login import current_user, login_required
 from service.user_service import get_user_by_id_service
 from utils.jwt_util import jwt_required
+from service.enrollment_service import list_my_enrollments
+from service.progress_service import get_my_progress
+from service.quiz_service import get_student_results_service
 
 class SimpleCache:
     def __init__(self):
@@ -38,9 +41,7 @@ def home():
         if cached_data:
             return render_template('dashboard/student_dashboard.html', **cached_data)
 
-        from service.enrollment_service import list_my_enrollments
-        from service.progress_service import get_my_progress
-        from service.quiz_service import get_student_results_service
+        
 
         enrollments = list_my_enrollments()
         enrolled_count = len(enrollments)
