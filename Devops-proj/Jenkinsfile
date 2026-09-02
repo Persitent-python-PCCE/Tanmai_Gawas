@@ -1,67 +1,55 @@
 pipeline {
-
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     environment {
-        DOCKER_HOST = 'tcp://localhost:2375'
-
-        FLASK_ENV = 'testing'
-
-        SECRET_KEY = 'jenkins-test-secret-key'
-        JWT_SECRET_KEY = 'jenkins-test-jwt-secret-key'
-
-        TEST_DATABASE_URI = 'sqlite:///test.db'
-
-        EMAIL='sunitagawas580@gmail.com'
-        APP_PASSWORD='thbpduiejsshwuqi'
+        // From Script 2: Docker & App Configurations
+        DOCKER_HOST        = 'tcp://localhost:2375'
+        FLASK_ENV          = 'testing'
+        SECRET_KEY         = 'jenkins-test-secret-key'
+        JWT_SECRET_KEY     = 'jenkins-test-jwt-secret-key'
+        TEST_DATABASE_URI  = 'sqlite:///test.db'
+        EMAIL              = 'sunitagawas580@gmail.com'
+        APP_PASSWORD       = 'thbpduiejsshwuqi'
+        
+        // Unified Executable Paths (Easily modify these variables if needed)
+        PYTHON_PATH_1      = 'C:\\Users\\ArulanandhaGuru\\AppData\\Local\\Programs\\Python\\Python311\\python.exe'
+        PYTHON_PATH_2      = 'C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Docker Login Test') {
-    steps {
-        withCredentials([
-            usernamePassword(
-                credentialsId: 'dockerhub-credentials',
-                usernameVariable: 'DOCKER_USER',
-                passwordVariable: 'DOCKER_PASS'
-            )
-        ]) {
-            bat '''
-                echo DOCKER_USER is [%DOCKER_USER%]
-                powershell -Command "Write-Host ('DOCKER_PASS length: ' + $env:DOCKER_PASS.Length)"
-                echo %DOCKER_PASS% | docker -H tcp://localhost:2375 login -u %DOCKER_USER% --password-stdin
-                if errorlevel 1 exit /b 1
-                docker info
-                docker logout
-            '''
-        }
-    }
-}
-
-        stage('Install Dependencies') {
+        stage('Install Dependencies & Test') {
             steps {
-                bat '"C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe" -m pip install -r Devops-proj\\requirements.txt'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                bat '''
+                // Runs tasks for User 1 (Root Directory)
+                bat """
+                    "${env.PYTHON_PATH_1}" --version
+                    "${env.PYTHON_PATH_1}" -m pip install -r requirements.txt
+                    "${env.PYTHON_PATH_1}" -m pytest
+                """
+                // Runs tasks for User 2 (Devops-proj Subdirectory)
+                bat """
+                    "${env.PYTHON_PATH_2}" -m pip install -r Devops-proj\\requirements.txt
                     cd Devops-proj
-                    "C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe" -m pytest -v
-                '''
+                    "${env.PYTHON_PATH_2}" -m pytest -v
+                """
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Images') {
             steps {
+                // Build User 1 Image (Root Directory)
+                bat 'docker build -t arulguru03/flask-app:latest .'
+                
+                // Build User 2 Image (Devops-proj Subdirectory)
                 dir('Devops-proj') {
                     bat 'docker build -t tanmaigawas/flask-app:latest .'
                 }
@@ -70,15 +58,31 @@ pipeline {
 
         stage('Push to Docker Hub') {
             steps {
+                // Authenticate and push for User 1
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'dockerhub-credentials',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
+                        credentialsId: 'dockerhub-cred',
+                        usernameVariable: 'DOCKER_USER_1',
+                        passwordVariable: 'DOCKER_PASS_1'
                     )
                 ]) {
                     bat '''
-                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                        docker login -u %DOCKER_USER_1% -p %DOCKER_PASS_1%
+                        docker push arulguru03/flask-app:latest
+                        docker logout
+                    '''
+                }
+
+                // Authenticate and push for User 2 (Secure stdin format)
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER_2',
+                        passwordVariable: 'DOCKER_PASS_2'
+                    )
+                ]) {
+                    bat '''
+                        echo %DOCKER_PASS_2% | docker login -u %DOCKER_USER_2% --password-stdin
                         docker push tanmaigawas/flask-app:latest
                         docker logout
                     '''
@@ -90,10 +94,26 @@ pipeline {
     post {
         success {
             echo 'Pipeline completed successfully!'
+            emailext(
+                subject: "SUCCESS ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    <h2>Jenkins build Successful</h2>
+                    <p><b>URL</b>: ${env.BUILD_URL}</p>
+                """,
+                to: "arulanandha.guru@revature.com"
+            )
         }
 
         failure {
             echo 'Pipeline failed!'
+            emailext(
+                subject: "FAILED ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                    <h2>Jenkins build Failed</h2>
+                    <p><b>URL</b>: ${env.BUILD_URL}</p>
+                """,
+                to: "gawastanmay373@gmail.com"
+            )
         }
     }
 }
