@@ -1,49 +1,65 @@
 pipeline {
+
     agent any
 
     stages {
 
-        stage('Checkout'){
-            steps{
+        stage('Checkout') {
+            steps {
                 checkout scm
             }
         }
 
-        stage('Install Dependencies'){
-            steps{
-                bat 'pip install -r requirements.txt'
-            }
-        }
-
-        stage('Test'){
+        stage('Install Dependencies') {
             steps {
-                bat 'pytest'
+                dir('Devops-proj') {
+                    bat 'pip install -r requirements.txt'
+                }
             }
         }
 
-        stage('Build Docker Image'){
-            steps{
-                bat 'docker build -t tanmaigawas/flask-app:latest .'
+        stage('Test') {
+            steps {
+                dir('Devops-proj') {
+                    bat 'pytest'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('Devops-proj') {
+                    bat 'docker build -t tanmaigawas/flask-app:latest .'
+                }
             }
         }
 
         stage('Push to Docker Hub') {
-            steps{
+            steps {
                 withCredentials([
                     usernamePassword(
                         credentialsId: 'dockerhub-credentials',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )
-                ]){
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                ]) {
+                    bat '''
+                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
                         docker push tanmaigawas/flask-app:latest
+                        docker logout
                     '''
                 }
             }
         }
-
     }
 
-} 
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
