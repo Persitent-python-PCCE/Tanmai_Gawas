@@ -38,7 +38,7 @@ pipeline {
                 ]){
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push arulguru03/flask-app:latest
+                        docker push tanmaigawas/flask-app:latest
                     '''
                 }
             }
