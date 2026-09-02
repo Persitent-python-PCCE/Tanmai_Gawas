@@ -9,6 +9,9 @@ pipeline {
         JWT_SECRET_KEY = 'jenkins-test-jwt-secret-key'
 
         TEST_DATABASE_URI = 'sqlite:///test.db'
+
+        EMAIL='sunitagawas580@gmail.com'
+        APP_PASSWORD='thbpduiejsshwuqi'
     }
 
     stages {
