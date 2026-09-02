@@ -62,29 +62,37 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-            emailext(
-                subject: "SUCCESS ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                    <h2>Jenkins build Successful</h2>
-                    <p><b>URL</b>: ${env.BUILD_URL}</p>
-                """,
-                to: "gawastanmay373@gmail.com"
-            )
-        }
+post {
+    success {
+        echo 'Pipeline completed successfully!'
 
-        failure {
-            echo 'Pipeline failed!'
-            emailext(
-                subject: "FAILED ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                    <h2>Jenkins build Failed</h2>
-                    <p><b>URL</b>: ${env.BUILD_URL}</p>
-                """,
-                to: "gawastanmay373@gmail.com"
-            )
-        }
+        mail(
+            to: 'gawastanmay373@gmail.com',
+            subject: "SUCCESS ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Jenkins build successful!
+
+Job: ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+URL: ${env.BUILD_URL}
+"""
+        )
     }
+
+    failure {
+        echo 'Pipeline failed!'
+
+        mail(
+            to: 'gawastanmay373@gmail.com',
+            subject: "FAILED ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+            body: """
+Jenkins build failed!
+
+Job: ${env.JOB_NAME}
+Build: #${env.BUILD_NUMBER}
+URL: ${env.BUILD_URL}
+"""
+        )
+    }
+}
 }
