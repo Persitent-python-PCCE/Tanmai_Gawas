@@ -2,6 +2,11 @@ pipeline {
 
     agent any
 
+    environment {
+        FLASK_ENV = 'testing'
+        TEST_DATABASE_URI = 'sqlite:///test.db'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -11,20 +16,19 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-    steps {
-        bat '"C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe" -m pip install -r Devops-proj\\requirements.txt'
-    }
-}
+            steps {
+                bat '"C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe" -m pip install -r Devops-proj\\requirements.txt'
+            }
+        }
 
         stage('Test') {
-    steps {
-        bat '''
-        cd Devops-proj
-        set FLASK_ENV=testing
-        "C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe" -m pytest
-        '''
-    }
-}
+            steps {
+                bat '''
+                    cd Devops-proj
+                    "C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe" -m pytest -v
+                '''
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
