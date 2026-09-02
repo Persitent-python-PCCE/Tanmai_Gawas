@@ -34,8 +34,9 @@ pipeline {
             )
         ]) {
             bat '''
-                echo DOCKER_HOST is %DOCKER_HOST%
-                echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
+                echo DOCKER_USER is [%DOCKER_USER%]
+                powershell -Command "Write-Host ('DOCKER_PASS length: ' + $env:DOCKER_PASS.Length)"
+                echo %DOCKER_PASS% | docker -H tcp://localhost:2375 login -u %DOCKER_USER% --password-stdin
                 if errorlevel 1 exit /b 1
                 docker info
                 docker logout
