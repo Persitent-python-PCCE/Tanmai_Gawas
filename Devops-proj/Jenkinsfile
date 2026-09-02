@@ -13,7 +13,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('Devops-proj') {
-                    bat 'pip install -r requirements.txt'
+                    bat 'py -3.14 -m pip install -r requirements.txt'
                 }
             }
         }
