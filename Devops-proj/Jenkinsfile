@@ -11,12 +11,19 @@ pipeline {
         }
 
         stage('Install Dependencies') {
-            steps {
-                dir('Devops-proj') {
-                    bat 'py -3.14 -m pip install -r requirements.txt'
-                }
-            }
+    steps {
+        dir('Devops-proj') {
+            bat '''
+                where python
+                python --version
+                where py
+                py --version
+                py -m pip --version
+                py -m pip install -r requirements.txt
+            '''
         }
+    }
+}
 
         stage('Test') {
             steps {
