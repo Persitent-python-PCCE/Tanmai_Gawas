@@ -100,7 +100,7 @@ pipeline {
                     <h2>Jenkins build Successful</h2>
                     <p><b>URL</b>: ${env.BUILD_URL}</p>
                 """,
-                to: "arulanandha.guru@revature.com"
+                to: "gawastanmay373@gmail.com"
             )
         }
 
