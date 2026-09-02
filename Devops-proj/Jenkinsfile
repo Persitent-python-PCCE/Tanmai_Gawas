@@ -4,6 +4,10 @@ pipeline {
 
     environment {
         FLASK_ENV = 'testing'
+
+        SECRET_KEY = 'jenkins-test-secret-key'
+        JWT_SECRET_KEY = 'jenkins-test-jwt-secret-key'
+
         TEST_DATABASE_URI = 'sqlite:///test.db'
     }
 
