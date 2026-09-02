@@ -1,7 +1,7 @@
-pipeline{
+pipeline {
     agent any
 
-    stages{
+    stages {
 
         stage('Checkout'){
             steps{
@@ -16,7 +16,7 @@ pipeline{
         }
 
         stage('Test'){
-            steps{
+            steps {
                 sh 'pytest'
             }
         }
@@ -27,20 +27,23 @@ pipeline{
             }
         }
 
-        stage('Push to Docker Hub'){
+        stage('Push to Docker Hub') {
             steps{
                 withCredentials([
-                    usernamePassword{
-                        credentialsId: '',
-                        "usernameVariable":"DOCKER_USER",
-                        "passwordVariable":"DOCKER_PASS"
-                    }
+                    usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
                 ]){
                     sh '''
-                    echo $DOCKER_USER
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push arulguru03/flask-app:latest
                     '''
                 }
             }
         }
+
     }
-}
+
+} 
