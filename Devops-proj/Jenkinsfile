@@ -18,7 +18,11 @@ pipeline {
 
         stage('Test') {
     steps {
-        bat 'cd Devops-proj && "C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe" -m pytest'
+        bat '''
+        cd Devops-proj
+        set FLASK_ENV=testing
+        "C:\\Users\\hp\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe" -m pytest
+        '''
     }
 }
 
